@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: MainMenuCommon.xml 1129 2014-12-23 15:52:19Z kik $ -->
+
+<mainMenu>
+	<menuBar>
+			<subMenu id="glimpse_menu">
+			<label>Glimpse</label>
+
+					<separatorItem />
+
+	  <scriptItem id="glimpse_file_manager">
+        <label>File Manager</label>
+        <scriptCode><![CDATA[
+from GL_File_Manager import HoudiniFileManager
+reload(HoudiniFileManager)
+HoudiniFileManager.run()]]></scriptCode>
+      </scriptItem>
+	
+      	</subMenu>
+	</menuBar>
+</mainMenu>
