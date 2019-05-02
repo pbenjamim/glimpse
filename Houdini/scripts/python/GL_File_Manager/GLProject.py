@@ -144,7 +144,7 @@ def getAssetTag(asset):
 
 def getAssetExtension(asset):
 	assetTokens = asset.split("_")
-	if (len(assetTokens > 1)):
+	if (len(assetTokens) > 1):
 		return (assetTokens[5].split("."))[1]
 	else:
 		return ""
