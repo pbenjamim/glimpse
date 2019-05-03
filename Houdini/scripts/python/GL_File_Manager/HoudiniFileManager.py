@@ -251,7 +251,7 @@ class FileManager(QtWidgets.QWidget):
 			hou.putenv("GLTex", (homepath + "\\04_tex\\").replace("\\", "/"))
 			hou.putenv("GLCache", (homepath + "\\06_caches\\").replace("\\", "/"))
 			hou.putenv("GLRender", (homepath + "\\07_renders\\").replace("\\", "/"))
-			hou.hipFile.save(fullpath)
+			hou.hipFile.save(fullpath.replace("\\", "/"))
 			self.updateFilesAndFilters()
 
 	def newFile(self, name, department, tag):
