@@ -44,6 +44,7 @@ class FileManager(QtWidgets.QWidget):
 		self.createButton = self.UI.findChild(QtWidgets.QPushButton, "createButton")
 		self.explorerButton = self.UI.findChild(QtWidgets.QPushButton, "explorerButton")
 		self.versionButton = self.UI.findChild(QtWidgets.QPushButton, "versionButton")
+		self.overwriteButton = self.UI.findChild(QtWidgets.QPushButton, "overwriteButton")
 
 
 
@@ -242,16 +243,16 @@ class FileManager(QtWidgets.QWidget):
 			hou.putenv("Hip", filefolder)
 			hou.hipFile.load(file)
 			hou.putenv("Hip", (project.rootDir + "\\").replace("\\", "/"))
+			hou.putenv("GLProject", (project.rootDir + "\\").replace("\\", "/"))
 
 	def saveFile(self, project, homepath, fullpath):
+			hou.hipFile.save(fullpath)
 			hou.putenv("Hip", (project.rootDir + "\\").replace("\\", "/"))
 			hou.putenv("GLProject", (project.rootDir + "\\").replace("\\", "/"))
 			hou.putenv("GLScene", GLProject.getFileFolderPath(fullpath))
 			hou.putenv("GLSim", (homepath + "\\05_sims\\").replace("\\", "/"))
-			hou.putenv("GLTex", (homepath + "\\04_tex\\").replace("\\", "/"))
 			hou.putenv("GLCache", (homepath + "\\06_caches\\").replace("\\", "/"))
 			hou.putenv("GLRender", (homepath + "\\07_renders\\").replace("\\", "/"))
-			hou.hipFile.save(fullpath.replace("\\", "/"))
 			self.updateFilesAndFilters()
 
 	def newFile(self, name, department, tag):
@@ -299,6 +300,27 @@ class FileManager(QtWidgets.QWidget):
 
 		if not (os.path.exists(fullpath)):
 			self.saveFile(project, homepath, fullpath)
+
+	def overwrite(self, file):
+		idx = self.projectList.row(self.projectList.currentItem())
+		project = self.glprojects[idx]
+
+		if(self.type == "Shot"):
+			fullpath = project.getShotPath(file)
+			homepath = project.getShotHomePath(file)
+		elif(self.type == "Char"):
+			fullpath = project.getCharPath(file)
+			homepath = project.getCharHomePath(file)
+		elif(self.type == "Env"):
+			fullpath = project.getEnvPath(file)
+			homepath = project.getEnvHomePath(file)
+		else:
+			fullpath = project.getPropPath(file)
+			homepath = project.getPropHomePath(file)
+
+		if (os.path.exists(fullpath)):
+			self.saveFile(project, homepath, fullpath)
+
 
 	###################################################
 	# Events
@@ -395,6 +417,10 @@ class FileManager(QtWidgets.QWidget):
 		if(self.project != "" and self.file != ""):
 			self.upVersion(self.file)
 
+	def overwriteButtonClicked(self):
+		if(self.project != "" and self.file != ""):
+			self.overwrite(self.file)
+
 	######################################################################################
 
 	def setupEvents(self):
@@ -421,6 +447,7 @@ class FileManager(QtWidgets.QWidget):
 		self.createButton.clicked.connect(self.createButtonClicked)
 		self.explorerButton.clicked.connect(self.explorerButtonClicked)
 		self.versionButton.clicked.connect(self.versionButtonClicked)
+		self.overwriteButton.clicked.connect(self.overwriteButtonClicked)
 
 	def __init__(self):
 		super(FileManager, self).__init__()

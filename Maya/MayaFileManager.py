@@ -49,6 +49,7 @@ class FileManager(QtWidgets.QWidget):
 		self.createButton = self.UI.findChild(QtWidgets.QPushButton, "createButton")
 		self.explorerButton = self.UI.findChild(QtWidgets.QPushButton, "explorerButton")
 		self.versionButton = self.UI.findChild(QtWidgets.QPushButton, "versionButton")
+		self.overwriteButton = self.UI.findChild(QtWidgets.QPushButton, "overwriteButton")
 
 
 
@@ -314,17 +315,37 @@ class FileManager(QtWidgets.QWidget):
 		if not (os.path.exists(fullpath)):
 			self.saveFile(project, homepath, fullpath)
 
+	def overwrite(self, file):
+		idx = self.projectList.row(self.projectList.currentItem())
+		project = self.glprojects[idx]
+
+		if(self.type == "Shot"):
+			fullpath = project.getShotPath(file)
+			homepath = project.getShotHomePath(file)
+		elif(self.type == "Char"):
+			fullpath = project.getCharPath(file)
+			homepath = project.getCharHomePath(file)
+		elif(self.type == "Env"):
+			fullpath = project.getEnvPath(file)
+			homepath = project.getEnvHomePath(file)
+		else:
+			fullpath = project.getPropPath(file)
+			homepath = project.getPropHomePath(file)
+
+		if (os.path.exists(fullpath)):
+			self.saveFile(project, homepath, fullpath)
+
 	###################################################
 	# Events
 	###################################################
 
 	def kdriveClicked(self):
-		self.drive = "E:"
-		self.updateDrive("E:")
+		self.drive = "K:"
+		self.updateDrive("K:")
 
 	def wdriveClicked(self):
-		self.drive = "E:"
-		self.updateDrive("E:")
+		self.drive = "W:"
+		self.updateDrive("W:")
 
 	def yearCboxActivated(self, index):
 		if (index != -1):
@@ -409,6 +430,10 @@ class FileManager(QtWidgets.QWidget):
 		if(self.project != "" and self.file != ""):
 			self.upVersion(self.file)
 
+	def overwriteButtonClicked(self):
+		if(self.project != "" and self.file != ""):
+			self.overwrite(self.file)
+
 	######################################################################################
 
 	def setupEvents(self):
@@ -435,6 +460,8 @@ class FileManager(QtWidgets.QWidget):
 		self.createButton.clicked.connect(self.createButtonClicked)
 		self.explorerButton.clicked.connect(self.explorerButtonClicked)
 		self.versionButton.clicked.connect(self.versionButtonClicked)
+		self.overwriteButton.clicked.connect(self.overwriteButtonClicked)
+
 
 	def __init__(self):
 		super(FileManager, self).__init__()
