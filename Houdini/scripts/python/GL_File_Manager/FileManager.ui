@@ -182,7 +182,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>60</y>
+     <y>100</y>
      <width>201</width>
      <height>30</height>
     </rect>
@@ -204,7 +204,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>100</y>
+     <y>140</y>
      <width>201</width>
      <height>121</height>
     </rect>
@@ -229,7 +229,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>230</y>
+     <y>270</y>
      <width>201</width>
      <height>31</height>
     </rect>
@@ -251,7 +251,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>270</y>
+     <y>310</y>
      <width>201</width>
      <height>30</height>
     </rect>
@@ -270,7 +270,7 @@
    <property name="geometry">
     <rect>
      <x>740</x>
-     <y>310</y>
+     <y>350</y>
      <width>201</width>
      <height>30</height>
     </rect>
@@ -376,7 +376,7 @@
     <rect>
      <x>740</x>
      <y>390</y>
-     <width>201</width>
+     <width>101</width>
      <height>30</height>
     </rect>
    </property>
@@ -393,9 +393,9 @@
   <widget class="QPushButton" name="overwriteButton">
    <property name="geometry">
     <rect>
-     <x>740</x>
-     <y>350</y>
-     <width>201</width>
+     <x>850</x>
+     <y>390</y>
+     <width>91</width>
      <height>30</height>
     </rect>
    </property>
