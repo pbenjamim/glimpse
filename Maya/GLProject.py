@@ -144,7 +144,8 @@ def getAssetTag(asset):
 
 def getAssetExtension(asset):
 	assetTokens = asset.split("_")
-	return (assetTokens[5].split("."))[1]
+	if (len(assetTokens) > 1):
+		return (assetTokens[5].split("."))[1]
 
 def getAssetVersion(asset):
 	assetTokens = asset.split("_")
@@ -169,7 +170,8 @@ def getShotTag(shot):
 
 def getShotExtension(shot):
 	shotTokens = shot.split("_")
-	return (shotTokens[4].split("."))[1]
+	if (len(shotTokens) > 1):
+		return (shotTokens[4].split("."))[1]
 
 def getShotVersion(shot):
 	shotTokens = shot.split("_")
