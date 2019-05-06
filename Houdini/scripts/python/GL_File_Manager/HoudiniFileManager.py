@@ -250,6 +250,7 @@ class FileManager(QtWidgets.QWidget):
 			hou.putenv("Hip", (project.rootDir + "\\").replace("\\", "/"))
 			hou.putenv("GLProject", (project.rootDir + "\\").replace("\\", "/"))
 			hou.putenv("GLScene", GLProject.getFileFolderPath(fullpath))
+			hou.putenv("GLTex", (homepath + "\\04_tex\\").replace("\\", "/"))
 			hou.putenv("GLSim", (homepath + "\\05_sims\\").replace("\\", "/"))
 			hou.putenv("GLCache", (homepath + "\\06_caches\\").replace("\\", "/"))
 			hou.putenv("GLRender", (homepath + "\\07_renders\\").replace("\\", "/"))
