@@ -248,6 +248,7 @@ class FileManager(QtWidgets.QWidget):
 				valid = True
 
 		if (valid):
+			cmds.file(new=True, force=True)
 			cmds.file(fullpath, o=True)
 			self.setWorkspace(homepath + "\\01_misc")
 
@@ -341,11 +342,11 @@ class FileManager(QtWidgets.QWidget):
 
 	def kdriveClicked(self):
 		self.drive = "K:"
-		self.updateDrive("K:")
+		self.updateDrive(self.drive)
 
 	def wdriveClicked(self):
 		self.drive = "W:"
-		self.updateDrive("W:")
+		self.updateDrive(self.drive)
 
 	def yearCboxActivated(self, index):
 		if (index != -1):
