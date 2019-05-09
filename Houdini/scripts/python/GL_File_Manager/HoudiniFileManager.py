@@ -223,18 +223,26 @@ class FileManager(QtWidgets.QWidget):
 		hou.hipFile.clear()
 		valid = False
 		if(self.type == "Shot"):
+			fullpath = project.getShotPath(file)
+			homepath = project.getShotHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getShotPath(file)).replace("\\", "/")
 			if (GLProject.getShotExtension(file) == "hip"):
 				valid = True
 		elif(self.type == "Char"):
+			fullpath = project.getCharPath(file)
+			homepath = project.getCharHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getCharPath(file)).replace("\\", "/")
 			if (GLProject.getAssetExtension(file) == "hip"):
 				valid = True
 		elif(self.type == "Env"):
+			fullpath = project.getEnvPath(file)
+			homepath = project.getEnvHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getEnvPath(file)).replace("\\", "/")
 			if (GLProject.getAssetExtension(file) == "hip"):
 				valid = True
 		else:
+			fullpath = project.getPropPath(file)
+			homepath = project.getPropHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getPropPath(file)).replace("\\", "/")
 			if (GLProject.getAssetExtension(file) == "hip"):
 				valid = True
@@ -244,6 +252,11 @@ class FileManager(QtWidgets.QWidget):
 			hou.hipFile.load(file)
 			hou.putenv("Hip", (project.rootDir + "\\").replace("\\", "/"))
 			hou.putenv("GLProject", (project.rootDir + "\\").replace("\\", "/"))
+			hou.putenv("GLScene", GLProject.getFileFolderPath(fullpath))
+			hou.putenv("GLTex", (homepath + "\\04_tex\\").replace("\\", "/"))
+			hou.putenv("GLSim", (homepath + "\\05_sims\\").replace("\\", "/"))
+			hou.putenv("GLCache", (homepath + "\\06_caches\\").replace("\\", "/"))
+			hou.putenv("GLRender", (homepath + "\\07_renders\\").replace("\\", "/"))
 
 	def saveFile(self, project, homepath, fullpath):
 			hou.hipFile.save(fullpath)
