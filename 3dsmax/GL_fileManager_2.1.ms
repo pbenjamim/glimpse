@@ -18,7 +18,7 @@ toolTip:"GL_fileManager"
 (
 ------------------------------------------------[ GLOBAL VARIABLES ]-------------------------------------------------
 
-local GL_Drives = #("K:", "W:")
+local GL_Drives = #("W:", "K:", "I:")
 local GL_Departments = #("layout","anim","model","rig","fx","lgt","print")
 local GL_AssetTypes = #("scene", "chars", "env", "props")
 
@@ -60,24 +60,24 @@ gc()
 
 try(destroydialog GLFM)catch()
 
-rollout GLFM "Glimpse File Manager v2.1" width:(588+150) height:390
+rollout GLFM "Glimpse File Manager v2.1" width:(588+450) height:(390+200)
 (
 	radiobuttons Drives ""  align:#left labels:GL_Drives
 
 	dropdownList Years "Year"  width:96 align:#left items:#()
 
-	multiListBox Projects "Project"  width:175 height:22 align:#left items:#()
-	multiListBox FileFilters "" pos:[200,86] width:150 height:22 items:#()
-	multiListBox Maxfiles ""  pos:[200+150,86] width:241 height:22 items:#()
-	multiListBox Departments ""  pos:[452+150,115] width:123 height:9 items:GL_Departments
+	multiListBox Projects "Project"  width:225 height:37 align:#left items:#()
+	multiListBox FileFilters "" pos:[250,86] width:(150+100) height:37 items:#()
+	multiListBox Maxfiles ""  pos:[250+262,86] width:(241+100) height:37 items:#()
+	multiListBox Departments ""  pos:[452+425,115] width:123 height:9 items:GL_Departments
 	radiobuttons AssetTypes ""  pos:[199,68] labels:GL_AssetTypes
 
-	button Create_BTN "Create"  pos:[451+150,274] width:125 height:35 border:true
-	button Open_BTN "Open"  pos:[451+150,309] width:125 height:35
-	button Version_BTN "Version Up"  pos:[451+150,344] width:125 height:35
+	button Create_BTN "Create"  pos:[451+425,274] width:125 height:35 border:true
+	button Open_BTN "Open"  pos:[451+425,309] width:125 height:35
+	button Version_BTN "Version Up"  pos:[451+425,344] width:125 height:35
 
-	edittext Filename_EDT ""  pos:[448+150,87] width:127 height:21 text:""
-	edittext Tag_EDT ""  pos:[448+150,246] width:127 height:21 text:"main" bold:false readOnly:false
+	edittext Filename_EDT ""  pos:[448+425,87] width:127 height:21 text:""
+	edittext Tag_EDT ""  pos:[448+425,246] width:127 height:21 text:"main" bold:false readOnly:false
 
 ------------------------------------------------[ EVENTS ]------------------------------------------------
 
@@ -534,6 +534,9 @@ fn initPreSelect = (
 	)
 	else if (maxFilt[1] == GL_Drives[2]) then (
 		GLFM.Drives.state = 2
+	)
+	else if (maxFilt[1] == GL_Drives[3]) then (
+		GLFM.Drives.state = 3
 	)
 	refreshYears()
 	refreshProjects()

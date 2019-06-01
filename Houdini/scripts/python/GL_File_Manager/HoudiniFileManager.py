@@ -25,6 +25,7 @@ class FileManager(QtWidgets.QWidget):
 
 		self.kdrive = self.UI.findChild(QtWidgets.QRadioButton, "kdrive")
 		self.wdrive = self.UI.findChild(QtWidgets.QRadioButton, "wdrive")
+		self.idrive = self.UI.findChild(QtWidgets.QRadioButton, "idrive")
 
 		self.yearCbox = self.UI.findChild(QtWidgets.QComboBox, "yearCbox")
 
@@ -348,6 +349,10 @@ class FileManager(QtWidgets.QWidget):
 		self.drive = "W:"
 		self.updateDrive("W:")
 
+	def idriveClicked(self):
+		self.drive = "I:"
+		self.updateDrive("I:")
+
 	def yearCboxActivated(self, index):
 		if (index != -1):
 			self.year = self.yearCbox.currentText()
@@ -441,6 +446,7 @@ class FileManager(QtWidgets.QWidget):
 
 		self.kdrive.clicked.connect(self.kdriveClicked)
 		self.wdrive.clicked.connect(self.wdriveClicked)
+		self.idrive.clicked.connect(self.idriveClicked)
 
 		self.yearCbox.activated.connect(self.yearCboxActivated)
 
