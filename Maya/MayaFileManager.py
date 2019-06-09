@@ -52,8 +52,6 @@ class FileManager(QtWidgets.QWidget):
 		self.versionButton = self.UI.findChild(QtWidgets.QPushButton, "versionButton")
 		self.overwriteButton = self.UI.findChild(QtWidgets.QPushButton, "overwriteButton")
 
-
-
 	def setupGUI(self):
 		self.loadUI()
 		self.mainLayout = QtWidgets.QVBoxLayout()
@@ -143,7 +141,6 @@ class FileManager(QtWidgets.QWidget):
 						if(GLProject.getAssetExtension(scenes[i]) == "mb"):
 							items.append(scenes[i])
 					self.fileList.addItems(items)
-
 
 	def updateFilesAndFilters(self):
 		self.clearFilters()
@@ -253,7 +250,6 @@ class FileManager(QtWidgets.QWidget):
 			cmds.file(fullpath, o=True)
 			self.setWorkspace(homepath + "\\01_misc")
 
-
 	def setWorkspace(self, fullpath):
 		cmds.workspace(fullpath, openWorkspace=True)
 
@@ -342,15 +338,15 @@ class FileManager(QtWidgets.QWidget):
 	###################################################
 
 	def kdriveClicked(self):
-		self.drive = "K:"
+		self.drive = self.drives[0]
 		self.updateDrive(self.drive)
 
 	def wdriveClicked(self):
-		self.drive = "W:"
+		self.drive = self.drives[1]
 		self.updateDrive(self.drive)
 
 	def idriveClicked(self):
-		self.drive = "I:"
+		self.drive = self.drives[2]
 		self.updateDrive(self.drive)
 
 	def yearCboxActivated(self, index):
@@ -469,9 +465,86 @@ class FileManager(QtWidgets.QWidget):
 		self.versionButton.clicked.connect(self.versionButtonClicked)
 		self.overwriteButton.clicked.connect(self.overwriteButtonClicked)
 
+	def preSelect(self):
+			toks = cmds.file(q=True, sn=True).split("/")
+			print(toks)
+			if (len(toks) < 7):
+				return False
+
+			# DRIVE -- ADJUST MANUALLY
+			drive = toks[0]
+			if drive == self.drives[0]:
+				self.kdrive.click()
+				self.kdrive.setChecked(True)
+			elif drive == self.drives[1]:
+				self.wdrive.click()
+				self.wdrive.setChecked(True)
+			elif drive == self.drives[2]:
+				self.idrive.click()
+				self.idrive.setChecked(True)
+			else:
+				return False
+
+			# YEAR
+			year = toks[1]
+			years = []
+			for i in range(0, self.yearCbox.count()):
+				years.append(self.yearCbox.itemText(i))
+			if year in years:
+				self.yearCbox.setCurrentIndex(years.index(year))
+				self.yearCboxActivated(years.index(year))
+			else:
+				return False
+
+			# PROJECT
+			project = toks[2]
+			projects = []
+			for i in range(0, self.projectList.count()):
+				self.projectList.setCurrentRow(i)
+				projects.append(self.projectList.currentItem().text())
+			if project in projects:
+				self.projectList.setCurrentRow(projects.index(project))
+				self.projectList.itemClicked.emit(self.projectList.currentItem())
+				self.projectListClicked(self.projectList.currentItem())
+			else:
+				return False
+
+			# ASSET / SHOT
+			filetype = toks[3]
+			if filetype == "30_shots":
+				self.shotRadio.click()
+			elif filetype == "20_assets":
+				assettype = toks[4]
+				if assettype == "chars":
+					self.charRadio.click()
+				elif assettype == "env":
+					self.envRadio.click()
+				elif assettype == "props":
+					self.propRadio.click()
+				else:
+					return False
+			else:
+				return False
+
+			# FILENAME
+			filename = cmds.file(q=True, sn=True, shn=True)
+			files = []
+			for i in range(0, self.fileList.count()):
+				self.fileList.setCurrentRow(i)
+				files.append(self.fileList.currentItem().text())
+			if filename in files:
+				self.fileList.setCurrentRow(files.index(filename))
+				self.fileList.itemClicked.emit(self.fileList.currentItem())
+				self.fileListClicked(self.fileList.currentItem())
+			else:
+				return False
+
+			return True
 
 	def __init__(self):
 		super(FileManager, self).__init__()
+		# This one has to be put manually
+		self.drives = ["K:", "W:", "I:"]
 
 		###################################################
 		# Class variables
@@ -489,9 +562,11 @@ class FileManager(QtWidgets.QWidget):
 		self.setupGUI()
 		self.setupEvents()
 
-		self.kdrive.click()
-		self.kdrive.setChecked(True)
-		self.shotRadio.click()
+		# pre select
+		if not ( self.preSelect() ):
+			self.kdrive.click()
+			self.kdrive.setChecked(True)
+			self.shotRadio.click()
 
 def run():
 	mayaMainWindowPtr = omui.MQtUtil.mainWindow() 
