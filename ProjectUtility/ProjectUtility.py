@@ -13,7 +13,7 @@ from subprocess import Popen
 
 cwd = os.getcwd()
 
-debug = True
+debug = False
 rootDirs = []
 
 if(debug):
