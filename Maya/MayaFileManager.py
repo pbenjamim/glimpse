@@ -541,6 +541,68 @@ class FileManager(QtWidgets.QWidget):
 
 			return True
 
+	def projectPreSelect(self, cachePath):
+		cache = open(cachePath, "r")
+
+		# DRIVE -- ADJUST MANUALLY
+		drive = cache.next().rstrip()
+		if drive == self.drives[0]:
+			self.kdrive.click()
+			self.kdrive.setChecked(True)
+		elif drive == self.drives[1]:
+			self.wdrive.click()
+			self.wdrive.setChecked(True)
+		elif drive == self.drives[2]:
+			self.idrive.click()
+			self.idrive.setChecked(True)
+		else:
+			cache.close()
+			return False
+
+		# YEAR
+		year = cache.next().rstrip()
+		years = []
+		for i in range(0, self.yearCbox.count()):
+			years.append(self.yearCbox.itemText(i))
+		if year in years:
+			self.yearCbox.setCurrentIndex(years.index(year))
+			self.yearCboxActivated(years.index(year))
+		else:
+			cache.close()
+			return False
+
+		# PROJECT
+		project = cache.next().rstrip()
+		projects = []
+		for i in range(0, self.projectList.count()):
+			self.projectList.setCurrentRow(i)
+			projects.append(self.projectList.currentItem().text())
+		if project in projects:
+			self.projectList.setCurrentRow(projects.index(project))
+			self.projectList.itemClicked.emit(self.projectList.currentItem())
+			self.projectListClicked(self.projectList.currentItem())
+		else:
+			cache.close()
+			return False
+
+		cache.close()
+		self.shotRadio.click()
+		return True
+
+	# write last project selection to cache (need drive year and project name)
+	def closeEvent(self, event):
+		if(self.drive != "" and self.year != "" and self.project != ""):
+			cachePath = os.path.dirname(os.path.realpath(__file__)) + "\\cache.txt"
+
+			if not (os.path.exists(cachePath)):
+				cache = open(cachePath, "w")
+			else:
+				cache = open(cachePath, "r+")
+				cache.truncate(0)
+
+			cache.write(self.drive + "\n" + self.year + "\n" + self.project)
+			cache.close()
+
 	def __init__(self):
 		super(FileManager, self).__init__()
 		# This one has to be put manually
@@ -564,9 +626,17 @@ class FileManager(QtWidgets.QWidget):
 
 		# pre select
 		if not ( self.preSelect() ):
-			self.kdrive.click()
-			self.kdrive.setChecked(True)
-			self.shotRadio.click()
+			# try to load prev project selection
+			cachePath = os.path.dirname(os.path.realpath(__file__)) + "\\cache.txt"
+
+			if (os.path.exists(cachePath)):
+				if not (self.projectPreSelect(cachePath) ):
+					print("Error in project pre select!")
+			else:
+				# default startup
+				self.kdrive.click()
+				self.kdrive.setChecked(True)
+				self.shotRadio.click()
 
 def run():
 	mayaMainWindowPtr = omui.MQtUtil.mainWindow() 
