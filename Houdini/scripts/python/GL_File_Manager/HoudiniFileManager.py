@@ -543,8 +543,8 @@ class FileManager(QtWidgets.QWidget):
 
 		return True
 
-	def projectPreSelect(self, cachePath):
-		cache = open(cachePath, "r")
+	def projectPreSelect(self):
+		cache = open(self.cachePath, "r")
 
 		# DRIVE -- ADJUST MANUALLY
 		drive = cache.next().rstrip()
@@ -594,12 +594,14 @@ class FileManager(QtWidgets.QWidget):
 	# write last project selection to cache (need drive year and project name)
 	def closeEvent(self, event):
 		if(self.drive != "" and self.year != "" and self.project != ""):
-			cachePath = os.path.dirname(os.path.realpath(__file__)) + "\\cache.txt"
 
-			if not (os.path.exists(cachePath)):
-				cache = open(cachePath, "w")
+			if not(os.path.exists("C:\\temp")):
+				os.mkdir("C:\\temp")
+
+			if not (os.path.exists(self.cachePath)):
+				cache = open(self.cachePath, "w")
 			else:
-				cache = open(cachePath, "r+")
+				cache = open(self.cachePath, "r+")
 				cache.truncate(0)
 
 			cache.write(self.drive + "\n" + self.year + "\n" + self.project)
@@ -610,7 +612,7 @@ class FileManager(QtWidgets.QWidget):
 		super(FileManager, self).__init__()
 		# This one has to be put manually
 		self.drives = ["K:", "W:", "I:"]
-
+		self.cachePath = "C:\\temp\\cache.txt"
 		###################################################
 		# Class variables
 		###################################################
@@ -630,10 +632,8 @@ class FileManager(QtWidgets.QWidget):
 		# pre select
 		if not ( self.preSelect() ):
 			# try to load prev project selection
-			cachePath = os.path.dirname(os.path.realpath(__file__)) + "\\cache.txt"
-
-			if (os.path.exists(cachePath)):
-				if not (self.projectPreSelect(cachePath) ):
+			if (os.path.exists(self.cachePath)):
+				if not (self.projectPreSelect() ):
 					print("Error in project pre select!")
 			else:
 				# default startup
