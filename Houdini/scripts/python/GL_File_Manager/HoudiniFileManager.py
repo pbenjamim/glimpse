@@ -12,6 +12,7 @@ import hou
 import os
 import sys
 import subprocess
+from sys import platform
 
 import GLProject
 reload(GLProject)
@@ -593,26 +594,30 @@ class FileManager(QtWidgets.QWidget):
 
 	# write last project selection to cache (need drive year and project name)
 	def closeEvent(self, event):
-		if(self.drive != "" and self.year != "" and self.project != ""):
+		if platform != "linux":
+			if(self.drive != "" and self.year != "" and self.project != ""):
 
-			if not(os.path.exists("C:\\temp")):
-				os.mkdir("C:\\temp")
+				if not(os.path.exists("C:\\temp")):
+					os.mkdir("C:\\temp")
 
-			if not (os.path.exists(self.cachePath)):
-				cache = open(self.cachePath, "w")
-			else:
-				cache = open(self.cachePath, "r+")
-				cache.truncate(0)
+				if not (os.path.exists(self.cachePath)):
+					cache = open(self.cachePath, "w")
+				else:
+					cache = open(self.cachePath, "r+")
+					cache.truncate(0)
 
-			cache.write(self.drive + "\n" + self.year + "\n" + self.project)
-			cache.close()
+				cache.write(self.drive + "\n" + self.year + "\n" + self.project)
+				cache.close()
 
 
 	def __init__(self):
 		super(FileManager, self).__init__()
 		# This one has to be put manually
-		self.drives = ["K:", "W:", "I:"]
-		self.cachePath = "C:\\temp\\cache.txt"
+		if platform == "linux":
+			self.drives = ["/home/diogo/work1", "/home/diogo/work2", "/home/diogo/work3"]
+		else:
+			self.drives = ["K:", "W:", "I:"]
+			self.cachePath = "C:\\temp\\cache.txt"
 		###################################################
 		# Class variables
 		###################################################
@@ -630,13 +635,19 @@ class FileManager(QtWidgets.QWidget):
 		self.setupEvents()
 
 		# pre select
-		if not ( self.preSelect() ):
-			# try to load prev project selection
-			if (os.path.exists(self.cachePath)):
-				if not (self.projectPreSelect() ):
-					print("Error in project pre select!")
-			else:
-				# default startup
+		if platform != "linux":
+			if not ( self.preSelect() ):
+				# try to load prev project selection
+				if (os.path.exists(self.cachePath)):
+					if not (self.projectPreSelect() ):
+						print("Error in project pre select!")
+				else:
+					# default startup
+					self.kdrive.click()
+					self.kdrive.setChecked(True)
+					self.shotRadio.click()
+		else:
+			if not ( self.preSelect() ):
 				self.kdrive.click()
 				self.kdrive.setChecked(True)
 				self.shotRadio.click()
