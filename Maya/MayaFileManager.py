@@ -26,7 +26,7 @@ from PySide2 import QtWidgets, QtCore, QtUiTools
 class FileManager(QtWidgets.QWidget):
 	def loadUI(self):
 		self.scriptPath = os.path.dirname(os.path.realpath(__file__))
-		self.UI = QtUiTools.QUiLoader().load(self.scriptPath + "\\FileManager.ui")
+		self.UI = QtUiTools.QUiLoader().load(self.scriptPath + "/FileManager.ui")
 
 		self.kdrive = self.UI.findChild(QtWidgets.QRadioButton, "kdrive")
 		self.wdrive = self.UI.findChild(QtWidgets.QRadioButton, "wdrive")
@@ -248,14 +248,14 @@ class FileManager(QtWidgets.QWidget):
 		if (valid):
 			cmds.file(new=True, force=True)
 			cmds.file(fullpath, o=True)
-			self.setWorkspace(homepath + "\\01_misc")
+			self.setWorkspace(homepath + "/01_misc")
 
 	def setWorkspace(self, fullpath):
 		cmds.workspace(fullpath, openWorkspace=True)
 
 	def newWorkspace(self, homepath):
-		fullpath = homepath + "\\01_misc"
-		workspacefile = open(fullpath + "\\workspace.mel", "w")
+		fullpath = homepath + "/01_misc"
+		workspacefile = open(fullpath + "/workspace.mel", "w")
 		workspacefile.write(Workspace.getWorkspaceFileAsString())
 		workspacefile.close()
 		self.setWorkspace(fullpath)
@@ -353,11 +353,11 @@ class FileManager(QtWidgets.QWidget):
 		if (index != -1):
 			self.year = self.yearCbox.currentText()
 			self.clearProjects()
-			projectsAux = GLProject.getProjects(self.drive + "\\" + self.year)
+			projectsAux = GLProject.getProjects(self.drive + "/" + self.year)
 
 			projects = []
 			for i in range(len(projectsAux)):
-				project = GLProject.GLProject(self.drive + "\\" + self.year + "\\" + projectsAux[i])
+				project = GLProject.GLProject(self.drive + "/" + self.year + "/" + projectsAux[i])
 				if(project.valid):
 					self.glprojects.append(project)
 					projects.append(projectsAux[i])
@@ -593,8 +593,8 @@ class FileManager(QtWidgets.QWidget):
 	def closeEvent(self, event):
 		if(self.drive != "" and self.year != "" and self.project != ""):
 
-			if not(os.path.exists("C:\\temp")):
-				os.mkdir("C:\\temp")
+			if not(os.path.exists("C:/temp")):
+				os.mkdir("C:/temp")
 
 			if not (os.path.exists(self.cachePath)):
 				cache = open(self.cachePath, "w")
@@ -609,7 +609,7 @@ class FileManager(QtWidgets.QWidget):
 		super(FileManager, self).__init__()
 		# This one has to be put manually
 		self.drives = ["K:", "W:", "I:"]
-		self.cachePath = "C:\\temp\\cache.txt"
+		self.cachePath = "C:/temp/cache.txt"
 		###################################################
 		# Class variables
 		###################################################
@@ -630,7 +630,7 @@ class FileManager(QtWidgets.QWidget):
 		if not ( self.preSelect() ):
 			# try to load prev project selection
 			if (os.path.exists(self.cachePath)):
-				if not (self.projectPreSelect(self.cachePath) ):
+				if not (self.projectPreSelect() ):
 					print("Error in project pre select!")
 			else:
 				# default startup

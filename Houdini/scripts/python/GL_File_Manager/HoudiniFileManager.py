@@ -227,48 +227,48 @@ class FileManager(QtWidgets.QWidget):
 		if(self.type == "Shot"):
 			fullpath = project.getShotPath(file)
 			homepath = project.getShotHomePath(file)
-			filefolder = GLProject.getFileFolderPath(project.getShotPath(file)).replace("\\", "/")
+			filefolder = GLProject.getFileFolderPath(project.getShotPath(file))
 			if (GLProject.getShotExtension(file) == "hip"):
 				valid = True
 		elif(self.type == "Char"):
 			fullpath = project.getCharPath(file)
 			homepath = project.getCharHomePath(file)
-			filefolder = GLProject.getFileFolderPath(project.getCharPath(file)).replace("\\", "/")
+			filefolder = GLProject.getFileFolderPath(project.getCharPath(file))
 			if (GLProject.getAssetExtension(file) == "hip"):
 				valid = True
 		elif(self.type == "Env"):
 			fullpath = project.getEnvPath(file)
 			homepath = project.getEnvHomePath(file)
-			filefolder = GLProject.getFileFolderPath(project.getEnvPath(file)).replace("\\", "/")
+			filefolder = GLProject.getFileFolderPath(project.getEnvPath(file))
 			if (GLProject.getAssetExtension(file) == "hip"):
 				valid = True
 		else:
 			fullpath = project.getPropPath(file)
 			homepath = project.getPropHomePath(file)
-			filefolder = GLProject.getFileFolderPath(project.getPropPath(file)).replace("\\", "/")
+			filefolder = GLProject.getFileFolderPath(project.getPropPath(file))
 			if (GLProject.getAssetExtension(file) == "hip"):
 				valid = True
 
 		if (valid):
 			hou.putenv("Hip", filefolder)
 			hou.hipFile.load(file)
-			hou.putenv("Hip", (project.rootDir + "\\").replace("\\", "/"))
-			hou.putenv("GLProject", (project.rootDir + "\\").replace("\\", "/"))
+			hou.putenv("Hip", (project.rootDir + "/"))
+			hou.putenv("GLProject", (project.rootDir + "/"))
 			hou.putenv("GLScene", GLProject.getFileFolderPath(fullpath))
-			hou.putenv("GLTex", (homepath + "\\04_tex\\").replace("\\", "/"))
-			hou.putenv("GLSim", (homepath + "\\05_sims\\").replace("\\", "/"))
-			hou.putenv("GLCache", (homepath + "\\06_caches\\").replace("\\", "/"))
-			hou.putenv("GLRender", (homepath + "\\07_renders\\").replace("\\", "/"))
+			hou.putenv("GLTex", (homepath + "/04_tex/"))
+			hou.putenv("GLSim", (homepath + "/05_sims/"))
+			hou.putenv("GLCache", (homepath + "/06_caches/"))
+			hou.putenv("GLRender", (homepath + "/07_renders/"))
 
 	def saveFile(self, project, homepath, fullpath):
 			hou.hipFile.save(fullpath)
-			hou.putenv("Hip", (project.rootDir + "\\").replace("\\", "/"))
-			hou.putenv("GLProject", (project.rootDir + "\\").replace("\\", "/"))
+			hou.putenv("Hip", (project.rootDir + "/"))
+			hou.putenv("GLProject", (project.rootDir + "/"))
 			hou.putenv("GLScene", GLProject.getFileFolderPath(fullpath))
-			hou.putenv("GLTex", (homepath + "\\04_tex\\").replace("\\", "/"))
-			hou.putenv("GLSim", (homepath + "\\05_sims\\").replace("\\", "/"))
-			hou.putenv("GLCache", (homepath + "\\06_caches\\").replace("\\", "/"))
-			hou.putenv("GLRender", (homepath + "\\07_renders\\").replace("\\", "/"))
+			hou.putenv("GLTex", (homepath + "/04_tex/"))
+			hou.putenv("GLSim", (homepath + "/05_sims/"))
+			hou.putenv("GLCache", (homepath + "/06_caches/"))
+			hou.putenv("GLRender", (homepath + "/07_renders/"))
 			self.updateFilesAndFilters()
 
 	def newFile(self, name, department, tag):
@@ -358,11 +358,11 @@ class FileManager(QtWidgets.QWidget):
 		if (index != -1):
 			self.year = self.yearCbox.currentText()
 			self.clearProjects()
-			projectsAux = GLProject.getProjects(self.drive + "\\" + self.year)
+			projectsAux = GLProject.getProjects(self.drive + "/" + self.year)
 
 			projects = []
 			for i in range(len(projectsAux)):
-				project = GLProject.GLProject(self.drive + "\\" + self.year + "\\" + projectsAux[i])
+				project = GLProject.GLProject(self.drive + "/" + self.year + "/" + projectsAux[i])
 				if(project.valid):
 					self.glprojects.append(project)
 					projects.append(projectsAux[i])
@@ -594,11 +594,11 @@ class FileManager(QtWidgets.QWidget):
 
 	# write last project selection to cache (need drive year and project name)
 	def closeEvent(self, event):
-		if platform != "linux":
+		if platform != "linux2":
 			if(self.drive != "" and self.year != "" and self.project != ""):
 
-				if not(os.path.exists("C:\\temp")):
-					os.mkdir("C:\\temp")
+				if not(os.path.exists("C:/temp")):
+					os.mkdir("C:/temp")
 
 				if not (os.path.exists(self.cachePath)):
 					cache = open(self.cachePath, "w")
@@ -613,11 +613,11 @@ class FileManager(QtWidgets.QWidget):
 	def __init__(self):
 		super(FileManager, self).__init__()
 		# This one has to be put manually
-		if platform == "linux":
-			self.drives = ["/home/diogo/work1", "/home/diogo/work2", "/home/diogo/work3"]
+		if platform == "linux2":
+			self.drives = ["/home/diogo/work", "/home/diogo/work2", "/home/diogo/work3"]
 		else:
 			self.drives = ["K:", "W:", "I:"]
-			self.cachePath = "C:\\temp\\cache.txt"
+			self.cachePath = "C:/temp/cache.txt"
 		###################################################
 		# Class variables
 		###################################################
@@ -635,7 +635,7 @@ class FileManager(QtWidgets.QWidget):
 		self.setupEvents()
 
 		# pre select
-		if platform != "linux":
+		if platform != "linux2":
 			if not ( self.preSelect() ):
 				# try to load prev project selection
 				if (os.path.exists(self.cachePath)):

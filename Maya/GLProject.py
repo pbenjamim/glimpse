@@ -84,10 +84,10 @@ import os
 # there may be some out-of-control changes so it must adapt!
 
 def getFileFolderPath(file):
-	fileTok = file.split("\\")
+	fileTok = file.split("/")
 	result = ""
 	for i in range(len(fileTok)-1):
-		result = result + fileTok[i] + "\\"
+		result = result + fileTok[i] + "/"
 	return result[:len(result)-1]
 
 ############################################
@@ -96,7 +96,7 @@ def getFileFolderPath(file):
 
 # drive: E:, K:, etc..
 def getYears(drive):
-	folders = os.listdir(drive + "\\")
+	folders = os.listdir(drive + "/")
 	years = []
 	for i in range(len(folders)):
 		try:
@@ -146,6 +146,8 @@ def getAssetExtension(asset):
 	assetTokens = asset.split("_")
 	if (len(assetTokens) > 1):
 		return (assetTokens[5].split("."))[1]
+	else:
+		return ""
 
 def getAssetVersion(asset):
 	assetTokens = asset.split("_")
@@ -172,6 +174,8 @@ def getShotExtension(shot):
 	shotTokens = shot.split("_")
 	if (len(shotTokens) > 1):
 		return (shotTokens[4].split("."))[1]
+	else:
+		return ""
 
 def getShotVersion(shot):
 	shotTokens = shot.split("_")
@@ -219,7 +223,7 @@ class GLProject:
 		self.rootDir = rootDir
 
 		# checking if loading an invalid rootDir
-		rootDirTokens = rootDir.split("\\")
+		rootDirTokens = rootDir.split("/")
 		if(len(rootDirTokens) < 3):
 			self.valid = False
 			print("[Loading Error] Project directory is invalid!")
@@ -244,11 +248,11 @@ class GLProject:
 		toValidate = 5
 		valid = 0
 
-		if (os.path.isdir(rootDir + "\\20_assets")): valid += 1
-		if (os.path.isdir(rootDir + "\\20_assets\\chars")): valid += 1
-		if (os.path.isdir(rootDir + "\\20_assets\\env")): valid += 1
-		if (os.path.isdir(rootDir + "\\20_assets\\props")): valid += 1
-		if (os.path.isdir(rootDir + "\\30_shots")): valid += 1
+		if (os.path.isdir(rootDir + "/20_assets")): valid += 1
+		if (os.path.isdir(rootDir + "/20_assets/chars")): valid += 1
+		if (os.path.isdir(rootDir + "/20_assets/env")): valid += 1
+		if (os.path.isdir(rootDir + "/20_assets/props")): valid += 1
+		if (os.path.isdir(rootDir + "/30_shots")): valid += 1
 
 		self.valid = False
 		if(valid == toValidate):
@@ -258,15 +262,15 @@ class GLProject:
 	# Directory functions
 	#############################
 	def getAssetsPath(self):
-		return self.rootDir + "\\20_assets"
+		return self.rootDir + "/20_assets"
 	def getCharsPath(self):
-		return self.getAssetsPath() + "\\chars"
+		return self.getAssetsPath() + "/chars"
 	def getEnvsPath(self):
-		return self.getAssetsPath() + "\\env"
+		return self.getAssetsPath() + "/env"
 	def getPropsPath(self):
-		return self.getAssetsPath() + "\\props"
+		return self.getAssetsPath() + "/props"
 	def getShotsPath(self):
-		return self.rootDir + "\\30_shots"
+		return self.rootDir + "/30_shots"
 
 	#############################
 	# Name functions
@@ -295,7 +299,7 @@ class GLProject:
 	def getScenes(self, names, path):
 		scenes = []
 		for i in range(len(names)):
-			sceneDir = path + "\\" + names[i] + "\\03_scenes"
+			sceneDir = path + "/" + names[i] + "/03_scenes"
 			scenes = scenes + os.listdir(sceneDir)
 		if "backup" in scenes: scenes.remove("backup")
 		return scenes
@@ -318,10 +322,10 @@ class GLProject:
 	def getScenesPath(self, names, path):
 		scenesPath = []
 		for i in range(len(names)):
-			sceneDir = path + "\\" + names[i] + "\\03_scenes"
+			sceneDir = path + "/" + names[i] + "/03_scenes"
 			dirFiles = os.listdir(sceneDir)
 			for j in range(len(dirFiles)):
-				dirFiles[j] = sceneDir + "\\" + dirFiles[j]
+				dirFiles[j] = sceneDir + "/" + dirFiles[j]
 			scenesPath = scenesPath + dirFiles
 		return scenesPath
 
@@ -335,69 +339,69 @@ class GLProject:
 		return self.getScenesPath(self.getShotNames(), self.getShotsPath())
 
 	def getShotHomePath(self, shot):
-		return self.getShotsPath() + "\\" + getShotName(shot)
+		return self.getShotsPath() + "/" + getShotName(shot)
 	def getCharHomePath(self, char):
-		return self.getCharsPath() + "\\" + getAssetName(char)
+		return self.getCharsPath() + "/" + getAssetName(char)
 	def getEnvHomePath(self, env):
-		return self.getEnvsPath() + "\\" + getAssetName(env)
+		return self.getEnvsPath() + "/" + getAssetName(env)
 	def getPropHomePath(self, prop):
-		return self.getPropsPath() + "\\" + getAssetName(prop)
+		return self.getPropsPath() + "/" + getAssetName(prop)
 
 	def getShotPath(self, shot):
-		return self.getShotsPath() + "\\" + getShotName(shot) + "\\03_scenes\\" + shot
+		return self.getShotsPath() + "/" + getShotName(shot) + "/03_scenes/" + shot
 	def getCharPath(self, char):
-		return self.getCharsPath() + "\\" + getAssetName(char) + "\\03_scenes\\" + char
+		return self.getCharsPath() + "/" + getAssetName(char) + "/03_scenes/" + char
 	def getEnvPath(self, env):
-		return self.getEnvsPath() + "\\" + getAssetName(env) + "\\03_scenes\\" + env
+		return self.getEnvsPath() + "/" + getAssetName(env) + "/03_scenes/" + env
 	def getPropPath(self, prop):
-		return self.getPropsPath() + "\\" + getAssetName(prop) + "\\03_scenes\\" + prop
+		return self.getPropsPath() + "/" + getAssetName(prop) + "/03_scenes/" + prop
 
 	#############################
 	# Creation functions
 	#############################
 	def createFolders(self, dir):
 		if not(os.path.exists(dir)): os.mkdir(dir)
-		if not(os.path.exists(dir + "\\01_misc")): os.mkdir(dir + "\\01_misc")
-		if not(os.path.exists(dir + "\\02_refs")): os.mkdir(dir + "\\02_refs")
-		if not(os.path.exists(dir + "\\03_scenes")): os.mkdir(dir + "\\03_scenes")
-		if not(os.path.exists(dir + "\\04_tex")): os.mkdir(dir + "\\04_tex")
-		if not(os.path.exists(dir + "\\05_sims")): os.mkdir(dir + "\\05_sims")
-		if not(os.path.exists(dir + "\\07_renders")): os.mkdir(dir + "\\07_renders")
-		if not(os.path.exists(dir + "\\08_comp")): os.mkdir(dir + "\\08_comp")
+		if not(os.path.exists(dir + "/01_misc")): os.mkdir(dir + "/01_misc")
+		if not(os.path.exists(dir + "/02_refs")): os.mkdir(dir + "/02_refs")
+		if not(os.path.exists(dir + "/03_scenes")): os.mkdir(dir + "/03_scenes")
+		if not(os.path.exists(dir + "/04_tex")): os.mkdir(dir + "/04_tex")
+		if not(os.path.exists(dir + "/05_sims")): os.mkdir(dir + "/05_sims")
+		if not(os.path.exists(dir + "/07_renders")): os.mkdir(dir + "/07_renders")
+		if not(os.path.exists(dir + "/08_comp")): os.mkdir(dir + "/08_comp")
 
 	def createShotFolders(self, dir):
 		self.createFolders(dir)
-		if not(os.path.exists(dir + "\\06_caches")):
-			os.mkdir(dir + "\\06_caches")
-			os.mkdir(dir + "\\06_caches\\assets")
-			os.mkdir(dir + "\\06_caches\\fx")
-			os.mkdir(dir + "\\06_caches\\proxies")
+		if not(os.path.exists(dir + "/06_caches")):
+			os.mkdir(dir + "/06_caches")
+			os.mkdir(dir + "/06_caches/assets")
+			os.mkdir(dir + "/06_caches/fx")
+			os.mkdir(dir + "/06_caches/proxies")
 
 	def createAssetFolders(self, dir):
 		self.createFolders(dir)
-		if not(os.path.exists(dir + "\\06_caches")):
-			os.mkdir(dir + "\\06_caches")
-			os.mkdir(dir + "\\06_caches\\abc")
-			os.mkdir(dir + "\\06_caches\\fbx")
-			os.mkdir(dir + "\\06_caches\\obj")
-			os.mkdir(dir + "\\06_caches\\proxies")
+		if not(os.path.exists(dir + "/06_caches")):
+			os.mkdir(dir + "/06_caches")
+			os.mkdir(dir + "/06_caches/abc")
+			os.mkdir(dir + "/06_caches/fbx")
+			os.mkdir(dir + "/06_caches/obj")
+			os.mkdir(dir + "/06_caches/proxies")
 
 	def newShot(self, name, department, tag):
-		self.createShotFolders(self.getShotsPath() + "\\" + name)
+		self.createShotFolders(self.getShotsPath() + "/" + name)
 		filename = newShot(self.tag, name, department, tag)
 		return filename
 
 	def newChar(self, name, department, tag):
-		self.createAssetFolders(self.getCharsPath() + "\\" + name)
-		filename = newAsset(self.tag, "char", name, department, tag)
+		self.createAssetFolders(self.getCharsPath() + "/" + name)
+		filename = newAsset(self.tag, "chars", name, department, tag)
 		return filename
 
 	def newEnv(self, name, department, tag):
-		self.createAssetFolders(self.getEnvsPath() + "\\" + name)
+		self.createAssetFolders(self.getEnvsPath() + "/" + name)
 		filename = newAsset(self.tag, "env", name, department, tag)
 		return filename
 
 	def newProp(self, name, department, tag):
-		self.createAssetFolders(self.getPropsPath() + "\\" + name)
-		filename = newAsset(self.tag, "prop", name, department, tag)
+		self.createAssetFolders(self.getPropsPath() + "/" + name)
+		filename = newAsset(self.tag, "props", name, department, tag)
 		return filename
