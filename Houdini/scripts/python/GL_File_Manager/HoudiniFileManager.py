@@ -225,9 +225,11 @@ class FileManager(QtWidgets.QWidget):
 		hou.hipFile.clear()
 		valid = False
 		if(self.type == "Shot"):
+			
 			fullpath = project.getShotPath(file)
 			homepath = project.getShotHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getShotPath(file))
+
 			if (GLProject.getShotExtension(file) == "hip"):
 				valid = True
 		elif(self.type == "Char"):
@@ -251,7 +253,7 @@ class FileManager(QtWidgets.QWidget):
 
 		if (valid):
 			hou.putenv("Hip", filefolder)
-			hou.hipFile.load(file)
+			hou.hipFile.load(fullpath)
 			hou.putenv("Hip", (project.rootDir + "/"))
 			hou.putenv("GLProject", (project.rootDir + "/"))
 			hou.putenv("GLScene", GLProject.getFileFolderPath(fullpath))
@@ -614,7 +616,7 @@ class FileManager(QtWidgets.QWidget):
 		super(FileManager, self).__init__()
 		# This one has to be put manually
 		if platform == "linux2":
-			self.drives = ["/home/diogo/work", "/home/diogo/work2", "/home/diogo/work3"]
+			self.drives = ["/home/diogo/work2", "/home/diogo/work", "/home/diogo/work3"]
 		else:
 			self.drives = ["K:", "W:", "I:"]
 			self.cachePath = "C:/temp/cache.txt"

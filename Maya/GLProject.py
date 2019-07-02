@@ -78,6 +78,7 @@ Shot
 """
 
 import os
+from sys import platform
 
 # [Approach to file system]
 # Dynamically read what's there,
@@ -224,16 +225,26 @@ class GLProject:
 
 		# checking if loading an invalid rootDir
 		rootDirTokens = rootDir.split("/")
-		if(len(rootDirTokens) < 3):
-			self.valid = False
-			print("[Loading Error] Project directory is invalid!")
-			return
 
-		self.drive = rootDirTokens[0]
-		self.year = rootDirTokens[1]
-		self.name = rootDirTokens[2]
+		if platform != "linux2":
+			if(len(rootDirTokens) < 3):
+				self.valid = False
+				print("[Loading Error] Project directory is invalid!")
+				return
+			self.drive = rootDirTokens[0]
+			self.year = rootDirTokens[1]
+			self.name = rootDirTokens[2]
+		else:
+			if(len(rootDirTokens) < 5):
+				self.valid = False
+				print("[Loading Error] Project directory is invalid!")
+				return
+			self.drive = rootDirTokens[0] + "/" + rootDirTokens[1] + "/" + rootDirTokens[2] + "/" + rootDirTokens[3] + "/"
+			self.year = rootDirTokens[4]
+			self.name = rootDirTokens[5]
 
 		nameTokens = self.name.split("_")
+
 		if(len(nameTokens) < 4):
 			self.valid = False
 			print("[Loading Error] Project name is invalid!")
