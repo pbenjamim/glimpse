@@ -1,32 +1,35 @@
 """
 # Code for running script
 
-import MayaFileManager
-reload(MayaFileManager)
-MayaFileManager.run()
+in maxscript listener:
+
+python.ExecuteFile "MaxFileManager.py"
 
 """
 #################################################################
 
-from maya import OpenMayaUI as omui
-from shiboken2 import wrapInstance
-import maya.cmds as cmds
-
 import os
 import subprocess
+import sys
+
+import MaxPlus
+fm = MaxPlus.FileManager
+
+scriptsDir = MaxPlus.PathManager.GetScriptsDir() + "/Python"
+sys.path.append( scriptsDir )
 
 import GLProject
 reload(GLProject)
 
-import Workspace
-reload(Workspace)
-
 from PySide2 import QtWidgets, QtCore, QtUiTools
+
+class _GCProtector(object):
+	widgets = []
 
 class FileManager(QtWidgets.QWidget):
 	def loadUI(self):
 		self.scriptPath = os.path.dirname(os.path.realpath(__file__))
-		self.UI = QtUiTools.QUiLoader().load(self.scriptPath + "/FileManager.ui")
+		self.UI = QtUiTools.QUiLoader().load(self.scriptPath + "\\FileManager.ui")
 
 		self.kdrive = self.UI.findChild(QtWidgets.QRadioButton, "kdrive")
 		self.wdrive = self.UI.findChild(QtWidgets.QRadioButton, "wdrive")
@@ -114,7 +117,7 @@ class FileManager(QtWidgets.QWidget):
 					items = []
 					scenes = project.getShotScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getShotExtension(scenes[i]) == "mb"):
+						if(GLProject.getShotExtension(scenes[i]) == "max"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -123,7 +126,7 @@ class FileManager(QtWidgets.QWidget):
 					items = []
 					scenes = project.getCharScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "mb"):
+						if(GLProject.getAssetExtension(scenes[i]) == "max"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -132,7 +135,7 @@ class FileManager(QtWidgets.QWidget):
 					items = []
 					scenes = project.getEnvScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "mb"):
+						if(GLProject.getAssetExtension(scenes[i]) == "max"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -141,7 +144,7 @@ class FileManager(QtWidgets.QWidget):
 					items = []
 					scenes = project.getPropScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "mb"):
+						if(GLProject.getAssetExtension(scenes[i]) == "max"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -158,17 +161,17 @@ class FileManager(QtWidgets.QWidget):
 					items = []
 					scenes = project.getShotScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getShotExtension(scenes[i]) == "mb"):
+						if(GLProject.getShotExtension(scenes[i]) == "max"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
 
 				elif(self.type == "Char"):
-					self.filterList.addItems(sorted(project.getCharNames()))
+					self.filterList.addItemssorted((project.getCharNames()))
 					items = []
 					scenes = project.getCharScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "mb"):
+						if(GLProject.getAssetExtension(scenes[i]) == "max"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -178,7 +181,7 @@ class FileManager(QtWidgets.QWidget):
 					items = []
 					scenes = project.getEnvScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "mb"):
+						if(GLProject.getAssetExtension(scenes[i]) == "max"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -188,7 +191,7 @@ class FileManager(QtWidgets.QWidget):
 					items = []
 					scenes = project.getPropScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "mb"):
+						if(GLProject.getAssetExtension(scenes[i]) == "max"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -236,63 +239,48 @@ class FileManager(QtWidgets.QWidget):
 		if(self.type == "Shot"):
 			fullpath = project.getShotPath(file)
 			homepath = project.getShotHomePath(file)
-			if (GLProject.getShotExtension(file) == "mb"):
+			if (GLProject.getShotExtension(file) == "max"):
 				valid = True
 		elif(self.type == "Char"):
 			fullpath = project.getCharPath(file)
 			homepath = project.getCharHomePath(file)
-			if (GLProject.getAssetExtension(file) == "mb"):
+			if (GLProject.getAssetExtension(file) == "max"):
 				valid = True
 		elif(self.type == "Env"):
 			fullpath = project.getEnvPath(file)
 			homepath = project.getEnvHomePath(file)
-			if (GLProject.getAssetExtension(file) == "mb"):
+			if (GLProject.getAssetExtension(file) == "max"):
 				valid = True
 		else:
 			fullpath = project.getPropPath(file)
 			homepath = project.getPropHomePath(file)
-			if (GLProject.getAssetExtension(file) == "mb"):
+			if (GLProject.getAssetExtension(file) == "max"):
 				valid = True
 
 		if (valid):
-			cmds.file(new=True, force=True)
-			cmds.file(fullpath, o=True)
-			self.setWorkspace(homepath + "/01_misc")
-
-	def setWorkspace(self, fullpath):
-		cmds.workspace(fullpath, openWorkspace=True)
-
-	def newWorkspace(self, homepath):
-		fullpath = homepath + "/01_misc"
-		workspacefile = open(fullpath + "/workspace.mel", "w")
-		workspacefile.write(Workspace.getWorkspaceFileAsString())
-		workspacefile.close()
-		self.setWorkspace(fullpath)
+			fm.Open(fullpath)
 
 	def saveFile(self, project, homepath, fullpath):
-			cmds.file(rename=fullpath)
-			cmds.file(save=True, de=False, type='mayaBinary')
-
-			self.newWorkspace(homepath)
-			self.updateFilesAndFilters()
+		fm.Save(fullpath)
+		self.updateFilesAndFilters()
 
 	def newFile(self, name, department, tag):
 		idx = self.projectList.row(self.projectList.currentItem())
 		project = self.glprojects[idx]
 		if(self.type == "Shot"):
-			filename = project.newShot(name, department, tag) + ".mb"
+			filename = project.newShot(name, department, tag) + ".max"
 			fullpath = project.getShotPath(filename)
 			homepath = project.getShotHomePath(filename)
 		elif(self.type == "Char"):
-			filename = project.newChar(name, department, tag) + ".mb"
+			filename = project.newChar(name, department, tag) + ".max"
 			fullpath = project.getCharPath(filename)
 			homepath = project.getCharHomePath(filename)
 		elif(self.type == "Env"):
-			filename = project.newEnv(name, department, tag) + ".mb"
+			filename = project.newEnv(name, department, tag) + ".max"
 			fullpath = project.getEnvPath(filename)
 			homepath = project.getEnvHomePath(filename)
 		else:
-			filename = project.newProp(name, department, tag) + ".mb"
+			filename = project.newProp(name, department, tag) + ".max"
 			fullpath = project.getPropPath(filename)
 			homepath = project.getPropHomePath(filename)
 
@@ -303,19 +291,19 @@ class FileManager(QtWidgets.QWidget):
 		project = self.glprojects[idx]
 
 		if(self.type == "Shot"):
-			filename = GLProject.upShotVersion(file) + ".mb"
+			filename = GLProject.upShotVersion(file) + ".max"
 			fullpath = project.getShotPath(filename)
 			homepath = project.getShotHomePath(file)
 		elif(self.type == "Char"):
-			filename = GLProject.upAssetVersion(file) + ".mb"
+			filename = GLProject.upAssetVersion(file) + ".max"
 			fullpath = project.getCharPath(filename)
 			homepath = project.getCharHomePath(file)
 		elif(self.type == "Env"):
-			filename = GLProject.upAssetVersion(file) + ".mb"
+			filename = GLProject.upAssetVersion(file) + ".max"
 			fullpath = project.getEnvPath(filename)
 			homepath = project.getEnvHomePath(file)
 		else:
-			filename = GLProject.upAssetVersion(file) + ".mb"
+			filename = GLProject.upAssetVersion(file) + ".max"
 			fullpath = project.getPropPath(filename)
 			homepath = project.getPropHomePath(file)
 
@@ -362,11 +350,11 @@ class FileManager(QtWidgets.QWidget):
 		if (index != -1):
 			self.year = self.yearCbox.currentText()
 			self.clearProjects()
-			projectsAux = GLProject.getProjects(self.drive + "/" + self.year)
+			projectsAux = GLProject.getProjects(self.drive + "\\" + self.year)
 
 			projects = []
 			for i in range(len(projectsAux)):
-				project = GLProject.GLProject(self.drive + "/" + self.year + "/" + projectsAux[i])
+				project = GLProject.GLProject(self.drive + "\\" + self.year + "\\" + projectsAux[i])
 				if(project.valid):
 					self.glprojects.append(project)
 					projects.append(projectsAux[i])
@@ -476,80 +464,79 @@ class FileManager(QtWidgets.QWidget):
 		self.overwriteButton.clicked.connect(self.overwriteButtonClicked)
 
 	def preSelect(self):
-			toks = cmds.file(q=True, sn=True).split("/")
-			print(toks)
-			if (len(toks) < 7):
-				return False
+		toks = fm.GetFileNameAndPath().split("/")
+		if (len(toks) < 7):
+			return False
 
-			# DRIVE -- ADJUST MANUALLY
-			drive = toks[0]
-			if drive == self.drives[0]:
-				self.kdrive.click()
-				self.kdrive.setChecked(True)
-			elif drive == self.drives[1]:
-				self.wdrive.click()
-				self.wdrive.setChecked(True)
-			elif drive == self.drives[2]:
-				self.idrive.click()
-				self.idrive.setChecked(True)
+		# DRIVE -- ADJUST MANUALLY
+		drive = toks[0]
+		if drive == self.drives[0]:
+			self.kdrive.click()
+			self.kdrive.setChecked(True)
+		elif drive == self.drives[1]:
+			self.wdrive.click()
+			self.wdrive.setChecked(True)
+		elif drive == self.drives[2]:
+			self.idrive.click()
+			self.idrive.setChecked(True)
+		else:
+			return False
+
+		# YEAR
+		year = toks[1]
+		years = []
+		for i in range(0, self.yearCbox.count()):
+			years.append(self.yearCbox.itemText(i))
+		if year in years:
+			self.yearCbox.setCurrentIndex(years.index(year))
+			self.yearCboxActivated(years.index(year))
+		else:
+			return False
+
+		# PROJECT
+		project = toks[2]
+		projects = []
+		for i in range(0, self.projectList.count()):
+			self.projectList.setCurrentRow(i)
+			projects.append(self.projectList.currentItem().text())
+		if project in projects:
+			self.projectList.setCurrentRow(projects.index(project))
+			self.projectList.itemClicked.emit(self.projectList.currentItem())
+			self.projectListClicked(self.projectList.currentItem())
+		else:
+			return False
+
+		# ASSET / SHOT
+		filetype = toks[3]
+		if filetype == "30_shots":
+			self.shotRadio.click()
+		elif filetype == "20_assets":
+			assettype = toks[4]
+			if assettype == "chars":
+				self.charRadio.click()
+			elif assettype == "env":
+				self.envRadio.click()
+			elif assettype == "props":
+				self.propRadio.click()
 			else:
 				return False
+		else:
+			return False
 
-			# YEAR
-			year = toks[1]
-			years = []
-			for i in range(0, self.yearCbox.count()):
-				years.append(self.yearCbox.itemText(i))
-			if year in years:
-				self.yearCbox.setCurrentIndex(years.index(year))
-				self.yearCboxActivated(years.index(year))
-			else:
-				return False
+		# FILENAME
+		filename = cmds.file(q=True, sn=True, shn=True)
+		files = []
+		for i in range(0, self.fileList.count()):
+			self.fileList.setCurrentRow(i)
+			files.append(self.fileList.currentItem().text())
+		if filename in files:
+			self.fileList.setCurrentRow(files.index(filename))
+			self.fileList.itemClicked.emit(self.fileList.currentItem())
+			self.fileListClicked(self.fileList.currentItem())
+		else:
+			return False
 
-			# PROJECT
-			project = toks[2]
-			projects = []
-			for i in range(0, self.projectList.count()):
-				self.projectList.setCurrentRow(i)
-				projects.append(self.projectList.currentItem().text())
-			if project in projects:
-				self.projectList.setCurrentRow(projects.index(project))
-				self.projectList.itemClicked.emit(self.projectList.currentItem())
-				self.projectListClicked(self.projectList.currentItem())
-			else:
-				return False
-
-			# ASSET / SHOT
-			filetype = toks[3]
-			if filetype == "30_shots":
-				self.shotRadio.click()
-			elif filetype == "20_assets":
-				assettype = toks[4]
-				if assettype == "chars":
-					self.charRadio.click()
-				elif assettype == "env":
-					self.envRadio.click()
-				elif assettype == "props":
-					self.propRadio.click()
-				else:
-					return False
-			else:
-				return False
-
-			# FILENAME
-			filename = cmds.file(q=True, sn=True, shn=True)
-			files = []
-			for i in range(0, self.fileList.count()):
-				self.fileList.setCurrentRow(i)
-				files.append(self.fileList.currentItem().text())
-			if filename in files:
-				self.fileList.setCurrentRow(files.index(filename))
-				self.fileList.itemClicked.emit(self.fileList.currentItem())
-				self.fileListClicked(self.fileList.currentItem())
-			else:
-				return False
-
-			return True
+		return True
 
 	def projectPreSelect(self):
 		cache = open(self.cachePath, "r")
@@ -603,8 +590,8 @@ class FileManager(QtWidgets.QWidget):
 	def closeEvent(self, event):
 		if(self.drive != "" and self.year != "" and self.project != ""):
 
-			if not(os.path.exists("C:/temp")):
-				os.mkdir("C:/temp")
+			if not(os.path.exists("C:\\temp")):
+				os.mkdir("C:\\temp")
 
 			if not (os.path.exists(self.cachePath)):
 				cache = open(self.cachePath, "w")
@@ -619,7 +606,7 @@ class FileManager(QtWidgets.QWidget):
 		super(FileManager, self).__init__()
 		# This one has to be put manually
 		self.drives = ["K:", "W:", "I:"]
-		self.cachePath = "C:/temp/cache.txt"
+		self.cachePath = "C:\\temp\\cache.txt"
 		###################################################
 		# Class variables
 		###################################################
@@ -636,6 +623,10 @@ class FileManager(QtWidgets.QWidget):
 		self.setupGUI()
 		self.setupEvents()
 
+		self.kdrive.click()
+		self.kdrive.setChecked(True)
+		self.shotRadio.click()
+
 		# pre select
 		if not ( self.preSelect() ):
 			# try to load prev project selection
@@ -649,9 +640,10 @@ class FileManager(QtWidgets.QWidget):
 				self.shotRadio.click()
 
 def run():
-	mayaMainWindowPtr = omui.MQtUtil.mainWindow() 
-	mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QtWidgets.QWidget) 
-
 	mainWin = FileManager()
-	mainWin.setParent(mayaMainWindow, QtCore.Qt.Window)
+
+	_GCProtector.widgets.append(mainWin)
+
 	mainWin.show()
+
+run()

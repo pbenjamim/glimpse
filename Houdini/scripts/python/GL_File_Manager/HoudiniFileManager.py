@@ -115,6 +115,7 @@ class FileManager(QtWidgets.QWidget):
 					for i in range(len(scenes)):
 						if(GLProject.getShotExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
+					items.sort()
 					self.fileList.addItems(items)
 
 				elif(self.type == "Char"):
@@ -123,6 +124,7 @@ class FileManager(QtWidgets.QWidget):
 					for i in range(len(scenes)):
 						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
+					items.sort()
 					self.fileList.addItems(items)
 
 				elif(self.type == "Env"):
@@ -131,6 +133,7 @@ class FileManager(QtWidgets.QWidget):
 					for i in range(len(scenes)):
 						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
+					items.sort()
 					self.fileList.addItems(items)
 
 				elif(self.type == "Prop"):
@@ -139,6 +142,7 @@ class FileManager(QtWidgets.QWidget):
 					for i in range(len(scenes)):
 						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
+					items.sort()
 					self.fileList.addItems(items)
 
 	def updateFilesAndFilters(self):
@@ -149,39 +153,43 @@ class FileManager(QtWidgets.QWidget):
 
 			if(self.type != ""):
 				if(self.type == "Shot"):
-					self.filterList.addItems(project.getShotNames())
+					self.filterList.addItems(sorted(project.getShotNames()))
 					items = []
 					scenes = project.getShotScenes()
 					for i in range(len(scenes)):
 						if(GLProject.getShotExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
+					items.sort()
 					self.fileList.addItems(items)
 
 				elif(self.type == "Char"):
-					self.filterList.addItems(project.getCharNames())
+					self.filterList.addItems(sorted(project.getCharNames()))
 					items = []
 					scenes = project.getCharScenes()
 					for i in range(len(scenes)):
 						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
+					items.sort()
 					self.fileList.addItems(items)
 
 				elif(self.type == "Env"):
-					self.filterList.addItems(project.getEnvNames())
+					self.filterList.addItems(sorted(project.getEnvNames()))
 					items = []
 					scenes = project.getEnvScenes()
 					for i in range(len(scenes)):
 						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
+					items.sort()
 					self.fileList.addItems(items)
 
 				elif(self.type == "Prop"):
-					self.filterList.addItems(project.getPropNames())
+					self.filterList.addItems(sorted(project.getPropNames()))
 					items = []
 					scenes = project.getPropScenes()
 					for i in range(len(scenes)):
 						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
+					items.sort()
 					self.fileList.addItems(items)
 
 	def filterFiles(self):
@@ -199,6 +207,7 @@ class FileManager(QtWidgets.QWidget):
 					if(GLProject.getAssetName(file) == self.filter):
 						result.append(file)
 		self.clearFiles()
+		result.sort()
 		self.fileList.addItems(result)
 
 	def openFileInExplorer(self, file):
@@ -369,6 +378,7 @@ class FileManager(QtWidgets.QWidget):
 					self.glprojects.append(project)
 					projects.append(projectsAux[i])
 
+			projects.sort()
 			self.projectList.addItems(projects)
 	
 	def shotClicked(self):
