@@ -287,11 +287,11 @@ class GLProject:
 	# Name functions
 	#############################
 	def getCharNames(self):
-		return next(os.walk(self.getCharsPath()))[1]
+		return next(os.walk(str(self.getCharsPath())))[1]
 	def getEnvNames(self):
-		return next(os.walk(self.getEnvsPath()))[1]
+		return next(os.walk(str(self.getEnvsPath())))[1]
 	def getPropNames(self):
-		return next(os.walk(self.getPropsPath()))[1]
+		return next(os.walk(str(self.getPropsPath())))[1]
 
 	def getAssetNames(self):
 		chars = self.getCharNames()
@@ -301,7 +301,7 @@ class GLProject:
 		return assets
 
 	def getShotNames(self):
-		return next(os.walk(self.getShotsPath()))[1]
+		return next(os.walk(str(self.getShotsPath())))[1]
 
 	#############################
 	# Scene file functions
