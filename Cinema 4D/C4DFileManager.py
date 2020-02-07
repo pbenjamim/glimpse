@@ -260,6 +260,7 @@ class FileManager(QtGui.QMainWindow):
 
 		if (valid):
 			c4d.documents.LoadFile(str(fullpath))
+			c4d.EventAdd()
 
 	def saveFile(self, project, homepath, fullpath):
 			doc = c4d.documents.GetActiveDocument()
@@ -267,8 +268,9 @@ class FileManager(QtGui.QMainWindow):
 			doc.SetDocumentPath(str(fullpath))
 			assets = []
 			missingAssets = []
-			#c4d.documents.SaveProject(doc, c4d.SAVEPROJECT_ASSETS | c4d.SAVEPROJECT_SCENEFILE, str(fullpath), assets, missingAssets)
-			c4d.documents.SaveDocument(doc, str(fullpath), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
+			#c4d.documents.SaveProject(doc, c4d.SAVEPROJECT_ASSETS | c4d.SAVEPROJECT_SCENEFILE | c4d.SAVEPROJECT_ADDTORECENTLIST | c4d.SAVEPROJECT_USEDOCUMENTNAMEASFILENAME, str(homepath), assets, missingAssets)
+			#c4d.documents.SaveDocument(doc, str(fullpath), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
+			c4d.documents.SaveDocument(doc, str(fullpath), c4d.SAVEDOCUMENTFLAGS_DIALOGSALLOWED, c4d.FORMAT_C4DEXPORT)
 			wci = c4d.GetWorldContainerInstance()
 			wci[90003] = str(fullpath)
 			self.updateFilesAndFilters()
@@ -474,6 +476,7 @@ class FileManager(QtGui.QMainWindow):
 
 	def preSelect(self):
 		toks = c4d.documents.GetActiveDocument().GetDocumentPath().split("\\")
+		print(toks)
 		#print(toks)
 		#toks = hou.c4dFile.path().split("/")
 		if (len(toks) < 7):
