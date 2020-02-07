@@ -1,18 +1,6 @@
 """
 Installation guide:
 
-copy PyQt4 folder and these files:
-
-sip.pyd
-sipconfig.py
-sipdistutils.py
-
-to C:/Program Files/Maxon Cinema 4D R21/resource/modules/python/libs/win64/python27.vs2008.framework/lib/site-packages
-
-Copy the FileManager scripts to:
-
-C:/Users/[USER]/AppData/Roaming/MAXON/Maxon Cinema 4D R21_64C2B3BD/library/scripts
-
 """
 #################################################################
 
@@ -25,12 +13,12 @@ from sys import platform
 import GLProject
 reload(GLProject)
 
-from PyQt4 import QtCore, QtGui, uic
+from PySide import QtGui, QtCore, QtUiTools
 
-class FileManager(QtGui.QWidget):
+class FileManager(QtGui.QMainWindow):
 	def loadUI(self):
 		self.scriptPath = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
-		self.UI = uic.loadUi(self.scriptPath + "/FileManager.ui", self)	
+		self.UI = QtUiTools.QUiLoader().load(self.scriptPath + "/FileManager.ui", self)
 		#self.setParent(hou.ui.mainQtWindow(), QtCore.Qt.Window)
 
 		self.kdrive = self.UI.findChild(QtGui.QRadioButton, "kdrive")
@@ -226,16 +214,16 @@ class FileManager(QtGui.QWidget):
 
 		if(self.type == "Shot"):
 			path = project.getShotPath(file)
-			subprocess.Popen(r'explorer /select,' + path)
+			subprocess.Popen(r'explorer /select,' + path.replace('/', '\\'))
 		elif(self.type == "Char"):
 			path = project.getCharPath(file)
-			subprocess.Popen(r'explorer /select,' + path)
+			subprocess.Popen(r'explorer /select,' + path.replace('/', '\\'))
 		elif(self.type == "Env"):
 			path = project.getEnvPath(file)
-			subprocess.Popen(r'explorer /select,' + path)
+			subprocess.Popen(r'explorer /select,' + path.replace('/', '\\'))
 		else:
 			path = project.getPropPath(file)
-			subprocess.Popen(r'explorer /select,' + path)
+			subprocess.Popen(r'explorer /select,' + path.replace('/', '\\'))
 
 	def openFile(self, file):
 		idx = self.projectList.row(self.projectList.currentItem())
@@ -244,7 +232,7 @@ class FileManager(QtGui.QWidget):
 		#hou.c4dFile.clear()
 		valid = False
 		if(self.type == "Shot"):
-			
+
 			fullpath = project.getShotPath(file)
 			homepath = project.getShotHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getShotPath(file))
@@ -383,7 +371,7 @@ class FileManager(QtGui.QWidget):
 
 			projects.sort()
 			self.projectList.addItems(projects)
-	
+
 	def shotClicked(self):
 		self.type = "Shot"
 		self.updateFilesAndFilters()
@@ -670,13 +658,25 @@ class FileManager(QtGui.QWidget):
 				self.shotRadio.click()
 
 def main():
-	app = QtGui.QApplication(sys.argv) 
+	app = QtGui.QApplication.instance()
+	if not app:
+		app = QtGui.QApplication(sys.argv)
 
 	mainWin = FileManager()
-	mainWin.show()
 
-	#sys.exit(app.exec_()) #<---Closes C4D too!!  
- 	app.exec_()  #Closes the Qt dialog  
+	mainWin.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint);
+	mainWin.setProperty("saveWindowPref", True)
+
+	mainWin.show()
+	mainWin.raise_()
+	mainWin.activateWindow()
+	
+	app.setActiveWindow(mainWin)
+	#app.raise_()
+	#app.activateWindow()
+
+	#sys.exit(app.exec_()) #<---Closes C4D too!!
+ 	app.exec_()  #Closes the Qt dialog
 
 if __name__ == '__main__':
 	main()
