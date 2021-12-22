@@ -14,8 +14,9 @@ import sys
 import subprocess
 from sys import platform
 
-import GLProject
-reload(GLProject)
+from . import GLProject
+import importlib
+importlib.reload(GLProject)
 
 from PySide2 import QtWidgets, QtCore, QtUiTools
 

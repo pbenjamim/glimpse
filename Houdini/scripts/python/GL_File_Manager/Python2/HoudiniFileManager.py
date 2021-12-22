@@ -1,61 +1,62 @@
 """
-Installation guide:
+# PASTE THIS IN SHELF TOOL ("Script" toolbar)
+
+from GL_File_Manager import HoudiniFileManager
+reload(HoudiniFileManager)
+HoudiniFileManager.run()
 
 """
 #################################################################
 
+import hou
 import os
 import sys
 import subprocess
-import c4d
 from sys import platform
 
-from . import GLProject
-import importlib
-importlib.reload(GLProject)
+import GLProject
+reload(GLProject)
 
-from PySide import QtGui, QtCore, QtUiTools
+from PySide2 import QtWidgets, QtCore, QtUiTools
 
-class FileManager(QtGui.QMainWindow):
+class FileManager(QtWidgets.QWidget):
 	def loadUI(self):
 		self.scriptPath = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
-		self.UI = QtUiTools.QUiLoader().load(self.scriptPath + "/FileManager.ui", self)
-		#self.setParent(hou.ui.mainQtWindow(), QtCore.Qt.Window)
+		self.UI = QtUiTools.QUiLoader().load(self.scriptPath + "/FileManager.ui")
+		self.setParent(hou.ui.mainQtWindow(), QtCore.Qt.Window)
 
-		self.kdrive = self.UI.findChild(QtGui.QRadioButton, "kdrive")
-		self.wdrive = self.UI.findChild(QtGui.QRadioButton, "wdrive")
-		self.idrive = self.UI.findChild(QtGui.QRadioButton, "idrive")
+		self.kdrive = self.UI.findChild(QtWidgets.QRadioButton, "kdrive")
+		self.wdrive = self.UI.findChild(QtWidgets.QRadioButton, "wdrive")
+		self.idrive = self.UI.findChild(QtWidgets.QRadioButton, "idrive")
 
-		self.yearCbox = self.UI.findChild(QtGui.QComboBox, "yearCbox")
+		self.yearCbox = self.UI.findChild(QtWidgets.QComboBox, "yearCbox")
 
-		self.shotRadio = self.UI.findChild(QtGui.QRadioButton, "shotRadio")
-		self.charRadio = self.UI.findChild(QtGui.QRadioButton, "charRadio")
-		self.envRadio = self.UI.findChild(QtGui.QRadioButton, "envRadio")
-		self.propRadio = self.UI.findChild(QtGui.QRadioButton, "propRadio")
+		self.shotRadio = self.UI.findChild(QtWidgets.QRadioButton, "shotRadio")
+		self.charRadio = self.UI.findChild(QtWidgets.QRadioButton, "charRadio")
+		self.envRadio = self.UI.findChild(QtWidgets.QRadioButton, "envRadio")
+		self.propRadio = self.UI.findChild(QtWidgets.QRadioButton, "propRadio")
 
-		self.projectList = self.UI.findChild(QtGui.QListWidget, "projectList")
-		self.filterList = self.UI.findChild(QtGui.QListWidget, "filterList")
-		self.fileList = self.UI.findChild(QtGui.QListWidget, "fileList")
+		self.projectList = self.UI.findChild(QtWidgets.QListWidget, "projectList")
+		self.filterList = self.UI.findChild(QtWidgets.QListWidget, "filterList")
+		self.fileList = self.UI.findChild(QtWidgets.QListWidget, "fileList")
 
-		self.nameEdit = self.UI.findChild(QtGui.QTextEdit, "nameEdit")
-		self.departmentList = self.UI.findChild(QtGui.QListWidget, "departmentList")
-		self.tagEdit = self.UI.findChild(QtGui.QTextEdit, "tagEdit")
+		self.nameEdit = self.UI.findChild(QtWidgets.QTextEdit, "nameEdit")
+		self.departmentList = self.UI.findChild(QtWidgets.QListWidget, "departmentList")
+		self.tagEdit = self.UI.findChild(QtWidgets.QTextEdit, "tagEdit")
 
-		self.createButton = self.UI.findChild(QtGui.QPushButton, "createButton")
-		self.explorerButton = self.UI.findChild(QtGui.QPushButton, "explorerButton")
-		self.versionButton = self.UI.findChild(QtGui.QPushButton, "versionButton")
-		self.overwriteButton = self.UI.findChild(QtGui.QPushButton, "overwriteButton")
+		self.createButton = self.UI.findChild(QtWidgets.QPushButton, "createButton")
+		self.explorerButton = self.UI.findChild(QtWidgets.QPushButton, "explorerButton")
+		self.versionButton = self.UI.findChild(QtWidgets.QPushButton, "versionButton")
+		self.overwriteButton = self.UI.findChild(QtWidgets.QPushButton, "overwriteButton")
 
 
 
 	def setupGUI(self):
 		self.loadUI()
-		"""
-		self.mainLayout = QtGui.QVBoxLayout()
+		self.mainLayout = QtWidgets.QVBoxLayout()
 		self.mainLayout.setContentsMargins(0,0,0,0)
 		self.mainLayout.addWidget(self.UI)
 		self.setLayout(self.mainLayout)
-		"""
 
 		####################################
 		# Fill static widgets
@@ -112,7 +113,7 @@ class FileManager(QtGui.QMainWindow):
 					items = []
 					scenes = project.getShotScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getShotExtension(scenes[i]) == "c4d"):
+						if(GLProject.getShotExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -121,7 +122,7 @@ class FileManager(QtGui.QMainWindow):
 					items = []
 					scenes = project.getCharScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "c4d"):
+						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -130,7 +131,7 @@ class FileManager(QtGui.QMainWindow):
 					items = []
 					scenes = project.getEnvScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "c4d"):
+						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -139,7 +140,7 @@ class FileManager(QtGui.QMainWindow):
 					items = []
 					scenes = project.getPropScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "c4d"):
+						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -156,7 +157,7 @@ class FileManager(QtGui.QMainWindow):
 					items = []
 					scenes = project.getShotScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getShotExtension(scenes[i]) == "c4d"):
+						if(GLProject.getShotExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -166,7 +167,7 @@ class FileManager(QtGui.QMainWindow):
 					items = []
 					scenes = project.getCharScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "c4d"):
+						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -176,7 +177,7 @@ class FileManager(QtGui.QMainWindow):
 					items = []
 					scenes = project.getEnvScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "c4d"):
+						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -186,7 +187,7 @@ class FileManager(QtGui.QMainWindow):
 					items = []
 					scenes = project.getPropScenes()
 					for i in range(len(scenes)):
-						if(GLProject.getAssetExtension(scenes[i]) == "c4d"):
+						if(GLProject.getAssetExtension(scenes[i]) == "hip"):
 							items.append(scenes[i])
 					items.sort()
 					self.fileList.addItems(items)
@@ -215,84 +216,89 @@ class FileManager(QtGui.QMainWindow):
 
 		if(self.type == "Shot"):
 			path = project.getShotPath(file)
-			subprocess.Popen(r'explorer /select,' + path.replace('/', '\\'))
+			subprocess.Popen(r'explorer /select,' + path)
 		elif(self.type == "Char"):
 			path = project.getCharPath(file)
-			subprocess.Popen(r'explorer /select,' + path.replace('/', '\\'))
+			subprocess.Popen(r'explorer /select,' + path)
 		elif(self.type == "Env"):
 			path = project.getEnvPath(file)
-			subprocess.Popen(r'explorer /select,' + path.replace('/', '\\'))
+			subprocess.Popen(r'explorer /select,' + path)
 		else:
 			path = project.getPropPath(file)
-			subprocess.Popen(r'explorer /select,' + path.replace('/', '\\'))
+			subprocess.Popen(r'explorer /select,' + path)
 
 	def openFile(self, file):
 		idx = self.projectList.row(self.projectList.currentItem())
 		project = self.glprojects[idx]
 
-		#hou.c4dFile.clear()
+		hou.hipFile.clear()
 		valid = False
 		if(self.type == "Shot"):
-
+			
 			fullpath = project.getShotPath(file)
 			homepath = project.getShotHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getShotPath(file))
 
-			if (GLProject.getShotExtension(file) == "c4d"):
+			if (GLProject.getShotExtension(file) == "hip"):
 				valid = True
 		elif(self.type == "Char"):
 			fullpath = project.getCharPath(file)
 			homepath = project.getCharHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getCharPath(file))
-			if (GLProject.getAssetExtension(file) == "c4d"):
+			if (GLProject.getAssetExtension(file) == "hip"):
 				valid = True
 		elif(self.type == "Env"):
 			fullpath = project.getEnvPath(file)
 			homepath = project.getEnvHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getEnvPath(file))
-			if (GLProject.getAssetExtension(file) == "c4d"):
+			if (GLProject.getAssetExtension(file) == "hip"):
 				valid = True
 		else:
 			fullpath = project.getPropPath(file)
 			homepath = project.getPropHomePath(file)
 			filefolder = GLProject.getFileFolderPath(project.getPropPath(file))
-			if (GLProject.getAssetExtension(file) == "c4d"):
+			if (GLProject.getAssetExtension(file) == "hip"):
 				valid = True
 
 		if (valid):
-			c4d.documents.LoadFile(str(fullpath))
-			c4d.EventAdd()
+			hou.putenv("Hip", filefolder)
+			hou.hipFile.load(fullpath)
+			hou.putenv("Hip", (project.rootDir + "/"))
+			hou.putenv("GLProject", (project.rootDir + "/"))
+			hou.putenv("GLScene", GLProject.getFileFolderPath(fullpath))
+			hou.putenv("GLTex", (homepath + "/04_tex/"))
+			hou.putenv("GLSim", (homepath + "/05_sims/"))
+			hou.putenv("GLCache", (homepath + "/06_caches/"))
+			hou.putenv("GLRender", (homepath + "/07_renders/"))
 
 	def saveFile(self, project, homepath, fullpath):
-			doc = c4d.documents.GetActiveDocument()
-			doc.SetDocumentName(str(fullpath).split("/")[-1])
-			doc.SetDocumentPath(str(fullpath))
-			assets = []
-			missingAssets = []
-			#c4d.documents.SaveProject(doc, c4d.SAVEPROJECT_ASSETS | c4d.SAVEPROJECT_SCENEFILE | c4d.SAVEPROJECT_ADDTORECENTLIST | c4d.SAVEPROJECT_USEDOCUMENTNAMEASFILENAME, str(homepath), assets, missingAssets)
-			#c4d.documents.SaveDocument(doc, str(fullpath), c4d.SAVEDOCUMENTFLAGS_NONE, c4d.FORMAT_C4DEXPORT)
-			c4d.documents.SaveDocument(doc, str(fullpath), c4d.SAVEDOCUMENTFLAGS_DIALOGSALLOWED, c4d.FORMAT_C4DEXPORT)
-			wci = c4d.GetWorldContainerInstance()
-			wci[90003] = str(fullpath)
+			hou.hipFile.save(fullpath)
+			hou.putenv("Hip", (project.rootDir + "/"))
+			hou.putenv("GLProject", (project.rootDir + "/"))
+			hou.putenv("GLScene", GLProject.getFileFolderPath(fullpath))
+			hou.putenv("GLTex", (homepath + "/04_tex/"))
+			hou.putenv("GLSim", (homepath + "/05_sims/"))
+			hou.putenv("GLCache", (homepath + "/06_caches/"))
+			hou.putenv("GLRender", (homepath + "/07_renders/"))
 			self.updateFilesAndFilters()
 
 	def newFile(self, name, department, tag):
 		idx = self.projectList.row(self.projectList.currentItem())
 		project = self.glprojects[idx]
 		if(self.type == "Shot"):
-			filename = project.newShot(name, department, tag) + ".c4d"
+			filename = project.newShot(name, department, tag) + ".hip"
 			fullpath = project.getShotPath(filename)
 			homepath = project.getShotHomePath(filename)
 		elif(self.type == "Char"):
-			filename = project.newChar(name, department, tag) + ".c4d"
+			filename = project.newChar(name, department, tag) + ".hip"
 			fullpath = project.getCharPath(filename)
 			homepath = project.getCharHomePath(filename)
 		elif(self.type == "Env"):
-			filename = project.newEnv(name, department, tag) + ".c4d"
+			filename = project.newEnv(name, department, tag) + ".hip"
 			fullpath = project.getEnvPath(filename)
 			homepath = project.getEnvHomePath(filename)
 		else:
-			filename = project.newProp(name, department, tag) + ".c4d"
+			filename = project.newProp(name, department, tag) + ".hip"
 			fullpath = project.getPropPath(filename)
 			homepath = project.getPropHomePath(filename)
 
@@ -303,19 +309,19 @@ class FileManager(QtGui.QMainWindow):
 		project = self.glprojects[idx]
 
 		if(self.type == "Shot"):
-			filename = GLProject.upShotVersion(file) + ".c4d"
+			filename = GLProject.upShotVersion(file) + ".hip"
 			fullpath = project.getShotPath(filename)
 			homepath = project.getShotHomePath(file)
 		elif(self.type == "Char"):
-			filename = GLProject.upAssetVersion(file) + ".c4d"
+			filename = GLProject.upAssetVersion(file) + ".hip"
 			fullpath = project.getCharPath(filename)
 			homepath = project.getCharHomePath(file)
 		elif(self.type == "Env"):
-			filename = GLProject.upAssetVersion(file) + ".c4d"
+			filename = GLProject.upAssetVersion(file) + ".hip"
 			fullpath = project.getEnvPath(filename)
 			homepath = project.getEnvHomePath(file)
 		else:
-			filename = GLProject.upAssetVersion(file) + ".c4d"
+			filename = GLProject.upAssetVersion(file) + ".hip"
 			fullpath = project.getPropPath(filename)
 			homepath = project.getPropHomePath(file)
 
@@ -374,7 +380,7 @@ class FileManager(QtGui.QMainWindow):
 
 			projects.sort()
 			self.projectList.addItems(projects)
-
+	
 	def shotClicked(self):
 		self.type = "Shot"
 		self.updateFilesAndFilters()
@@ -476,10 +482,7 @@ class FileManager(QtGui.QMainWindow):
 		self.overwriteButton.clicked.connect(self.overwriteButtonClicked)
 
 	def preSelect(self):
-		toks = c4d.documents.GetActiveDocument().GetDocumentPath().split("\\")
-		print(toks)
-		#print(toks)
-		#toks = hou.c4dFile.path().split("/")
+		toks = hou.hipFile.path().split("/")
 		if (len(toks) < 7):
 			return False
 
@@ -539,7 +542,7 @@ class FileManager(QtGui.QMainWindow):
 			return False
 
 		# FILENAME
-		filename = c4d.documents.GetActiveDocument().GetDocumentName()
+		filename = hou.hipFile.basename()
 		files = []
 		for i in range(0, self.fileList.count()):
 			self.fileList.setCurrentRow(i)
@@ -625,7 +628,7 @@ class FileManager(QtGui.QMainWindow):
 		if platform == "linux2":
 			self.drives = ["/home/diogo/work2", "/home/diogo/work", "/home/diogo/work3"]
 		else:
-			self.drives = ["E:", "W:", "I:"]
+			self.drives = ["K:", "W:", "I:"]
 			self.cachePath = "C:/temp/cache.txt"
 		###################################################
 		# Class variables
@@ -661,26 +664,6 @@ class FileManager(QtGui.QMainWindow):
 				self.kdrive.setChecked(True)
 				self.shotRadio.click()
 
-def main():
-	app = QtGui.QApplication.instance()
-	if not app:
-		app = QtGui.QApplication(sys.argv)
-
+def run():
 	mainWin = FileManager()
-
-	mainWin.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint);
-	mainWin.setProperty("saveWindowPref", True)
-
 	mainWin.show()
-	mainWin.raise_()
-	mainWin.activateWindow()
-	
-	app.setActiveWindow(mainWin)
-	#app.raise_()
-	#app.activateWindow()
-
-	#sys.exit(app.exec_()) #<---Closes C4D too!!
- 	app.exec_()  #Closes the Qt dialog
-
-if __name__ == '__main__':
-	main()

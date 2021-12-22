@@ -10,9 +10,8 @@ import subprocess
 import c4d
 from sys import platform
 
-from . import GLProject
-import importlib
-importlib.reload(GLProject)
+import GLProject
+reload(GLProject)
 
 from PySide import QtGui, QtCore, QtUiTools
 
