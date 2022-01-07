@@ -12,7 +12,8 @@
         <label>File Manager</label>
         <scriptCode><![CDATA[
 from GL_File_Manager import HoudiniFileManager
-reload(HoudiniFileManager)
+import importlib
+importlib.reload(HoudiniFileManager)
 HoudiniFileManager.run()]]></scriptCode>
       </scriptItem>
 	
