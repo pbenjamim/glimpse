@@ -557,7 +557,7 @@ class FileManager(QtGui.QMainWindow):
 		cache = open(self.cachePath, "r")
 
 		# DRIVE -- ADJUST MANUALLY
-		drive = cache.next().rstrip()
+		drive = cache.readline().rstrip()
 		if drive == self.drives[0]:
 			self.kdrive.click()
 			self.kdrive.setChecked(True)
@@ -572,7 +572,7 @@ class FileManager(QtGui.QMainWindow):
 			return False
 
 		# YEAR
-		year = cache.next().rstrip()
+		year = cache.readline().rstrip()
 		years = []
 		for i in range(0, self.yearCbox.count()):
 			years.append(self.yearCbox.itemText(i))

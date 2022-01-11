@@ -561,7 +561,7 @@ class FileManager(QtWidgets.QWidget):
 		cache = open(self.cachePath, "r")
 
 		# DRIVE -- ADJUST MANUALLY
-		drive = cache.next().rstrip()
+		drive = cache.readline().rstrip()
 		if drive == self.drives[0]:
 			self.kdrive.click()
 			self.kdrive.setChecked(True)
@@ -576,7 +576,7 @@ class FileManager(QtWidgets.QWidget):
 			return False
 
 		# YEAR
-		year = cache.next().rstrip()
+		year = cache.readline().rstrip()
 		years = []
 		for i in range(0, self.yearCbox.count()):
 			years.append(self.yearCbox.itemText(i))
@@ -588,7 +588,7 @@ class FileManager(QtWidgets.QWidget):
 			return False
 
 		# PROJECT
-		project = cache.next().rstrip()
+		project = cache.readline().rstrip()
 		projects = []
 		for i in range(0, self.projectList.count()):
 			self.projectList.setCurrentRow(i)
