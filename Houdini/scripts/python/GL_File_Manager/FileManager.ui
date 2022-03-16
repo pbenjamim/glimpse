@@ -43,7 +43,7 @@
   <widget class="QRadioButton" name="kdrive">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>460</x>
      <y>0</y>
      <width>40</width>
      <height>30</height>
@@ -68,7 +68,7 @@
   <widget class="QRadioButton" name="wdrive">
    <property name="geometry">
     <rect>
-     <x>590</x>
+     <x>550</x>
      <y>0</y>
      <width>40</width>
      <height>30</height>
@@ -415,7 +415,7 @@
   <widget class="QRadioButton" name="idrive">
    <property name="geometry">
     <rect>
-     <x>670</x>
+     <x>640</x>
      <y>0</y>
      <width>40</width>
      <height>30</height>
@@ -432,6 +432,28 @@
    </property>
    <property name="text">
     <string>I:</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="sdrive">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>0</y>
+     <width>40</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>S:</string>
    </property>
   </widget>
  </widget>

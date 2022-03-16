@@ -29,6 +29,7 @@ class FileManager(QtWidgets.QWidget):
 		self.kdrive = self.UI.findChild(QtWidgets.QRadioButton, "kdrive")
 		self.wdrive = self.UI.findChild(QtWidgets.QRadioButton, "wdrive")
 		self.idrive = self.UI.findChild(QtWidgets.QRadioButton, "idrive")
+		self.sdrive = self.UI.findChild(QtWidgets.QRadioButton, "sdrive")
 
 		self.yearCbox = self.UI.findChild(QtWidgets.QComboBox, "yearCbox")
 
@@ -366,6 +367,10 @@ class FileManager(QtWidgets.QWidget):
 		self.drive = self.drives[2]
 		self.updateDrive(self.drive)
 
+	def sdriveClicked(self):
+		self.drive = self.drives[3]
+		self.updateDrive(self.drive)
+
 	def yearCboxActivated(self, index):
 		if (index != -1):
 			self.year = self.yearCbox.currentText()
@@ -460,6 +465,7 @@ class FileManager(QtWidgets.QWidget):
 		self.kdrive.clicked.connect(self.kdriveClicked)
 		self.wdrive.clicked.connect(self.wdriveClicked)
 		self.idrive.clicked.connect(self.idriveClicked)
+		self.sdrive.clicked.connect(self.sdriveClicked)
 
 		self.yearCbox.activated.connect(self.yearCboxActivated)
 
@@ -498,6 +504,9 @@ class FileManager(QtWidgets.QWidget):
 		elif drive == self.drives[2]:
 			self.idrive.click()
 			self.idrive.setChecked(True)
+		elif drive == self.drives[3]:
+			self.sdrive.click()
+			self.sdrive.setChecked(True)
 		else:
 			return False
 
@@ -571,6 +580,9 @@ class FileManager(QtWidgets.QWidget):
 		elif drive == self.drives[2]:
 			self.idrive.click()
 			self.idrive.setChecked(True)
+		elif drive == self.drives[3]:
+			self.sdrive.click()
+			self.sdrive.setChecked(True)
 		else:
 			cache.close()
 			return False
@@ -629,7 +641,7 @@ class FileManager(QtWidgets.QWidget):
 		if platform == "linux2":
 			self.drives = ["/home/diogo/work2", "/home/diogo/work", "/home/diogo/work3"]
 		else:
-			self.drives = ["K:", "W:", "I:"]
+			self.drives = ["K:", "W:", "I:", "S:"]
 			self.cachePath = "C:/temp/cache.txt"
 		###################################################
 		# Class variables
