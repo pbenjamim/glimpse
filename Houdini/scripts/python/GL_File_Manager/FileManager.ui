@@ -87,6 +87,51 @@
     <string>W:</string>
    </property>
   </widget>
+    <widget class="QRadioButton" name="idrive">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>0</y>
+     <width>40</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>I:</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="sdrive">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>0</y>
+     <width>40</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>S:</string>
+   </property>
+  </widget>
+ </widget>
   <widget class="QComboBox" name="yearCbox">
    <property name="geometry">
     <rect>
@@ -412,51 +457,6 @@
     <string>Overwrite</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="idrive">
-   <property name="geometry">
-    <rect>
-     <x>640</x>
-     <y>0</y>
-     <width>40</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>I:</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="sdrive">
-   <property name="geometry">
-    <rect>
-     <x>730</x>
-     <y>0</y>
-     <width>40</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>S:</string>
-   </property>
-  </widget>
- </widget>
  <resources/>
  <connections/>
 </ui>
