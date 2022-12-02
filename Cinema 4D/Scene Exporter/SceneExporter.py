@@ -1,4 +1,5 @@
 from typing import Optional
+from pathlib import Path
 import c4d
 import os
 
@@ -141,7 +142,6 @@ def ExportSelectionSets(exportSets, nullObject):
             objects.append(selectionObjectList.ObjectFromIndex(activeDoc, idx));
 
         # For each object
-        #print(objects);
         for obj in objects:
             ExportObject(exportSet, obj, nullObject);
 
@@ -172,26 +172,26 @@ def ExportObject(exportSet, objectToExport, nullObject):
         exportDir += "\\obj";
         fileExtention = ".obj";
         exportFormat = c4d.FORMAT_OBJ2EXPORT;
-        
+
     selectedDestination = nullObject[c4d.ID_USERDATA, exportSet.Destination[0][1].id];
     destinationDir = "\\";
-    
+
     # to Max
     if selectedDestination == 0:
-        destinationDir += "to Max";
+        destinationDir += "toMax";
     # to C4d
     elif selectedDestination == 1:
-        destinationDir += "to C4d";
+        destinationDir += "toC4d";
     # to Hou
     elif selectedDestination == 2:
-        destinationDir += "to Hou";
+        destinationDir += "toHou";
     # to Maya
     elif selectedDestination == 3:
-        destinationDir += "to Maya";
+        destinationDir += "toMaya";
     # to Blender
     elif selectedDestination == 4:
-        destinationDir += "to Blender";
-        
+        destinationDir += "toBlender";
+
     exportDir += destinationDir;
 
     # Get a fresh, temporary document with only the selected object (in a list)
@@ -200,8 +200,7 @@ def ExportObject(exportSet, objectToExport, nullObject):
     # If directory does not exist, create the dir
     if os.path.isdir(exportDir) == False:
         #print("Export directory does not exist, creating...");
-        os.mkdir(exportDir);
-        return;
+        Path(exportDir).mkdir(parents=True, exist_ok=True);
 
     #TODO PLUGIN PRESET RESEARCH
     """
@@ -233,14 +232,17 @@ def ExportObject(exportSet, objectToExport, nullObject):
 
     objFileName = docNameTokens[0] + "_" + docNameTokens[1] + "_" + docNameTokens[2] + "_" + objectToExport.GetName() + "_" + versionString + fileExtention;
 
+    #print("Exporting to " + exportDir + "\\" + objFileName)
+
     # Export it
     if c4d.documents.SaveDocument(docTemp, exportDir + "\\" + objFileName, c4d.SAVEDOCUMENTFLAGS_NONE, exportFormat) == False:
-        print("Could not export object");
+        print("Could not export object " + objFileName);
     else:
         print("Exported object " + objectToExport.GetName());
 
     # Destroy temp document
-    c4d.documents.KillDocument(docTemp)
+    c4d.documents.KillDocument(docTemp);
+    c4d.EventAdd();
     pass
 
 # Scans for all current export sets in the UI, returns list
@@ -309,21 +311,21 @@ def NewExportSet(setNumber, nullObject, parentGroupDescID):
     versionContainer[c4d.DESC_NAME] = "Version";
     versionContainer[c4d.DESC_SHORT_NAME] = "Version";
     versionContainer[c4d.DESC_STEP] = 1;
-    versionContainer[c4d.DESC_MIN] = 0;
+    versionContainer[c4d.DESC_MIN] = 1;
     versionContainer[c4d.DESC_MINEX] = False;
     versionContainer[c4d.DESC_MAX] = 999;
     versionContainer[c4d.DESC_MAXEX] = False;
-    versionContainer[c4d.DESC_DEFAULT] = 0;
+    versionContainer[c4d.DESC_DEFAULT] = 1;
     versionContainer[c4d.DESC_ANIMATE] = c4d.DESC_ANIMATE_OFF;
 
     destinationContainer[c4d.DESC_NAME] = "Destination";
     destinationContainer[c4d.DESC_SHORT_NAME] = "Destination";
     destinationContainerValues = c4d.BaseContainer();
-    destinationContainerValues[0] = "to Max";
-    destinationContainerValues[1] = "to C4d";
-    destinationContainerValues[2] = "to Hou";
-    destinationContainerValues[3] = "to Maya";
-    destinationContainerValues[3] = "to Blender";
+    destinationContainerValues[0] = "toMax";
+    destinationContainerValues[1] = "toC4d";
+    destinationContainerValues[2] = "toHou";
+    destinationContainerValues[3] = "toMaya";
+    destinationContainerValues[3] = "toBlender";
     destinationContainer[c4d.DESC_CYCLE] = destinationContainerValues;
     destinationContainer[c4d.DESC_ANIMATE] = c4d.DESC_ANIMATE_OFF;
 
@@ -423,7 +425,7 @@ def DeleteExportSet(exportSet, nullObject):
     nullObject = op.GetObject();
     userDataContainer = nullObject.GetUserDataContainer();
     exportSets = ScanExportSets(userDataContainer);
-    
+
     print("BEFORE");
     setCounter = 0;
     for eS in exportSets:
@@ -432,16 +434,16 @@ def DeleteExportSet(exportSet, nullObject):
         #print(nullObject[c4d.ID_USERDATA, eS.Set[0][1].id])
         eS.Set[1][c4d.DESC_NAME] = "Set " + str(setCounter);
         #eS.Set[1].SetString(c4d.DESC_NAME, "Set " + str(setCounter));
-        
+
         #print(eS.Set[1][c4d.DESC_NAME]);
         eS.Set[1][c4d.DESC_SHORT_NAME] = "Set " + str(setCounter);
         #eS.Set[1].SetString(c4d.DESC_SHORT_NAME, "Set " + str(setCounter));
 
     c4d.EventAdd(c4d.EVENT_FORCEREDRAW);
-    
+
     print("AFTER");
     for eS in exportSets:
         print(eS.Set[1][c4d.DESC_NAME]);
     """
-        
+
     pass
