@@ -37,7 +37,7 @@ class ExportSet:
         self.Destination = exportSetUserDataList[8];
         self.Format = exportSetUserDataList[9];
         self.FormatSettings = exportSetUserDataList[10];
-        
+
         #self.Presets = exportSetUserDataList[???];
 
         pass
@@ -135,6 +135,7 @@ def ExportSelectionSets(exportSets, nullObject):
             return
 
         selectionObjectList = pickedObject[c4d.SELECTIONOBJECT_LIST];
+        selectionSetName = pickedObject.GetName();
 
         # Contains no objects
         if(selectionObjectList == None):
@@ -147,13 +148,15 @@ def ExportSelectionSets(exportSets, nullObject):
 
         # For each object
         #print(objects);
-        for obj in objects:
-            ExportObject(exportSet, obj, nullObject);
+        #for obj in objects:
+            #ExportObjects(exportSet, objects, nullObject);
+
+        ExportObjects(exportSet, objects, nullObject, selectionSetName);
 
     activeDoc.SetActiveObject(nullObject, c4d.SELECTION_NEW);
     pass
 
-def ExportObject(exportSet, objectToExport, nullObject):
+def ExportObjects(exportSet, objectsToExport, nullObject, selectionSetName):
     # Get exportation path:
     # With current GL_Project folder structure, just go up 1 dir,
     # enter 06_caches and enter abc/fbx/obj
@@ -199,8 +202,9 @@ def ExportObject(exportSet, objectToExport, nullObject):
 
     exportDir += destinationDir;
 
+    # NOTE: This doesn't work with Alembic, at least if animations are desired, we need the actual active doc
     # Get a fresh, temporary document with only the selected object (in a list)
-    docTemp = c4d.documents.IsolateObjects(activeDoc, [objectToExport]);
+    docTemp = c4d.documents.IsolateObjects(activeDoc, objectsToExport);
 
     # If directory does not exist, create the dir
     if os.path.isdir(exportDir) == False:
@@ -236,7 +240,7 @@ def ExportObject(exportSet, objectToExport, nullObject):
         print("Error: Document name is invalid");
         return
 
-    objFileName = docNameTokens[0] + "_" + docNameTokens[1] + "_" + docNameTokens[2] + "_" + objectToExport.GetName() + "_" + versionString + fileExtention;
+    objFileName = docNameTokens[0] + "_" + docNameTokens[1] + "_" + docNameTokens[2] + "_" + selectionSetName + "_" + versionString + fileExtention;
 
     exportPath = exportDir + "\\" + objFileName;
 
@@ -244,27 +248,27 @@ def ExportObject(exportSet, objectToExport, nullObject):
     if exportFormat == c4d.FORMAT_ABCEXPORT:
         startFrame =  nullObject[c4d.ID_USERDATA, exportSet.StartFrame[0][1].id];
         endFrame =  nullObject[c4d.ID_USERDATA, exportSet.EndFrame[0][1].id];
-        ExportAlembic(docTemp, exportPath, objectToExport, startFrame, endFrame);
+        ExportAlembic(activeDoc, exportPath, selectionSetName, objectsToExport, startFrame, endFrame);
     # Else, export it normally
     else:
         if c4d.documents.SaveDocument(docTemp, exportPath, c4d.SAVEDOCUMENTFLAGS_DONTADDTORECENTLIST, exportFormat) == False:
-            print("Could not export object " + objectToExport.GetName());
+            print("Could not export selection set " + selectionSetName);
         else:
-            print("Exported object " + objectToExport.GetName());
-        
+            print("Exported selection set " + selectionSetName);
+
     # Destroy temp document
     c4d.documents.KillDocument(docTemp);
     c4d.EventAdd();
     pass
 
-def ExportAlembic(doc, exportPath, objectToExport, startFrame, endFrame):
+def ExportAlembic(doc, exportPath, selectionSetName, objects, startFrame, endFrame):
     plug = c4d.plugins.FindPlugin(1028082, c4d.PLUGINTYPE_SCENESAVER)
     if plug is None:
         print("Could not find Alembic Export plugin");
         return
 
     op = {}
-    
+
     # Send MSG_RETRIEVEPRIVATEDATA to Alembic export plugin
     if plug.Message(c4d.MSG_RETRIEVEPRIVATEDATA, op):
         if "imexporter" not in op:
@@ -277,24 +281,46 @@ def ExportAlembic(doc, exportPath, objectToExport, startFrame, endFrame):
             print("Could not find abcExport")
             return
 
-        # TODO Backup Alembic export settings
+        # Backup Alembic export settings
         backupStartFrame = abcExport[c4d.ABCEXPORT_FRAME_START];
         backupEndFrame = abcExport[c4d.ABCEXPORT_FRAME_END];
-        
+        backupSelectionOnly = abcExport[c4d.ABCEXPORT_SELECTION_ONLY];
+
         # Change Alembic export settings
         abcExport[c4d.ABCEXPORT_FRAME_START] = startFrame;
         abcExport[c4d.ABCEXPORT_FRAME_END] = endFrame;
+        abcExport[c4d.ABCEXPORT_SELECTION_ONLY] = True;
+
+        # Backup current selection
+        backupObjectSelection = doc.GetActiveObjects(c4d.GETACTIVEOBJECTFLAGS_SELECTIONORDER|c4d.GETACTIVEOBJECTFLAGS_CHILDREN);
+
+        # Deselect them
+        for obj in backupObjectSelection:
+            doc.SetActiveObject(obj, c4d.SELECTION_SUB);
+
+        # Select the objects (needed for animation export)
+        for obj in objects:
+            doc.SetActiveObject(obj, c4d.SELECTION_ADD);
 
         # Finally export the document
         if c4d.documents.SaveDocument(doc, exportPath, c4d.SAVEDOCUMENTFLAGS_DONTADDTORECENTLIST, c4d.FORMAT_ABCEXPORT) == False:
-            print("Could not export object " + objectToExport.GetName());
+            print("Could not export selection set " + selectionSetName);
         else:
-            print("Exported object " + objectToExport.GetName());
-            
+            print("Exported selection set " + selectionSetName);
+
         # Restore Alembic Export settings
         abcExport[c4d.ABCEXPORT_FRAME_START] = backupStartFrame;
         abcExport[c4d.ABCEXPORT_FRAME_END] = backupEndFrame;
-        
+        abcExport[c4d.ABCEXPORT_SELECTION_ONLY] = backupSelectionOnly;
+
+        # Deselect export objects
+        for obj in objects:
+            doc.SetActiveObject(obj, c4d.SELECTION_SUB);
+
+        # Restore previous selection
+        for obj in backupObjectSelection:
+            doc.SetActiveObject(obj, c4d.SELECTION_ADD);
+
     pass
 
 
@@ -324,12 +350,12 @@ def ScanExportSets(userDataContainer):
 # Creates a new ExportSet UserData
 def NewExportSet(setNumber, nullObject, parentGroupDescID):
     activeDoc = c4d.documents.GetActiveDocument();
-    
+
     # Read Timeline Min Frame
     startFrame = activeDoc.GetMinTime().GetFrame(activeDoc.GetFps());
     # Read Timeline Max Frame
     endFrame = activeDoc.GetMaxTime().GetFrame(activeDoc.GetFps());
-    
+
     newExportUserDataList = [];
 
     # NOTE: Order of objects in list is important!
@@ -361,7 +387,7 @@ def NewExportSet(setNumber, nullObject, parentGroupDescID):
     deleteContainer[c4d.DESC_NAME] = "Delete";
     deleteContainer[c4d.DESC_SHORT_NAME] = "Delete";
     deleteContainer.SetInt32(c4d.DESC_CUSTOMGUI, c4d.CUSTOMGUI_BUTTON);
-    
+
     startFrameContainer[c4d.DESC_NAME] = "Start Frame";
     startFrameContainer[c4d.DESC_SHORT_NAME] = "Start Frame";
     startFrameContainer[c4d.DESC_STEP] = 1;
@@ -369,7 +395,7 @@ def NewExportSet(setNumber, nullObject, parentGroupDescID):
     startFrameContainer[c4d.DESC_MINEX] = False;
     startFrameContainer[c4d.DESC_DEFAULT] = 0;
     startFrameContainer[c4d.DESC_ANIMATE] = c4d.DESC_ANIMATE_OFF;
-    
+
     endFrameContainer[c4d.DESC_NAME] = "End Frame";
     endFrameContainer[c4d.DESC_SHORT_NAME] = "End Frame";
     endFrameContainer[c4d.DESC_STEP] = 1;
@@ -405,7 +431,7 @@ def NewExportSet(setNumber, nullObject, parentGroupDescID):
     destinationContainerValues[1] = "to C4d";
     destinationContainerValues[2] = "to Hou";
     destinationContainerValues[3] = "to Maya";
-    destinationContainerValues[3] = "to Blender";
+    destinationContainerValues[4] = "to Blender";
     destinationContainer[c4d.DESC_CYCLE] = destinationContainerValues;
     destinationContainer[c4d.DESC_ANIMATE] = c4d.DESC_ANIMATE_OFF;
 
@@ -477,10 +503,10 @@ def NewExportSet(setNumber, nullObject, parentGroupDescID):
     #newExportUserDataList.append((presetsContainerDescID, presetsContainer));
 
     newExportSet = ExportSet(newExportUserDataList);
-    
+
     nullObject[c4d.ID_USERDATA, newExportSet.StartFrame[0][1].id] = startFrame;
     nullObject[c4d.ID_USERDATA, newExportSet.EndFrame[0][1].id] = endFrame;
-    
+
     c4d.EventAdd();
     return newExportSet;
 
