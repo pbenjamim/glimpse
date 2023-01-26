@@ -186,19 +186,19 @@ def ExportObjects(exportSet, objectsToExport, nullObject, selectionSetName):
 
     # to Max
     if selectedDestination == 0:
-        destinationDir += "to Max";
+        destinationDir += "toMax";
     # to C4d
     elif selectedDestination == 1:
-        destinationDir += "to C4d";
+        destinationDir += "toC4d";
     # to Hou
     elif selectedDestination == 2:
-        destinationDir += "to Hou";
+        destinationDir += "toHou";
     # to Maya
     elif selectedDestination == 3:
-        destinationDir += "to Maya";
+        destinationDir += "toMaya";
     # to Blender
     elif selectedDestination == 4:
-        destinationDir += "to Blender";
+        destinationDir += "toBlender";
 
     exportDir += destinationDir;
 
