@@ -244,11 +244,15 @@ def ExportObjects(exportSet, objectsToExport, nullObject, selectionSetName):
 
     exportPath = exportDir + "\\" + objFileName;
 
-    # If Alembic format, export in a special way
+    # If Alembic OR FBX format, export in a certain way
     if exportFormat == c4d.FORMAT_ABCEXPORT:
         startFrame =  nullObject[c4d.ID_USERDATA, exportSet.StartFrame[0][1].id];
         endFrame =  nullObject[c4d.ID_USERDATA, exportSet.EndFrame[0][1].id];
         ExportAlembic(activeDoc, exportPath, selectionSetName, objectsToExport, startFrame, endFrame);
+
+    elif exportFormat == c4d.FORMAT_FBX_EXPORT:
+        ExportFBX(activeDoc, exportPath, selectionSetName, objectsToExport);
+
     # Else, export it normally
     else:
         if c4d.documents.SaveDocument(docTemp, exportPath, c4d.SAVEDOCUMENTFLAGS_DONTADDTORECENTLIST, exportFormat) == False:
@@ -312,6 +316,54 @@ def ExportAlembic(doc, exportPath, selectionSetName, objects, startFrame, endFra
         abcExport[c4d.ABCEXPORT_FRAME_START] = backupStartFrame;
         abcExport[c4d.ABCEXPORT_FRAME_END] = backupEndFrame;
         abcExport[c4d.ABCEXPORT_SELECTION_ONLY] = backupSelectionOnly;
+
+        # Deselect export objects
+        for obj in objects:
+            doc.SetActiveObject(obj, c4d.SELECTION_SUB);
+
+        # Restore previous selection
+        for obj in backupObjectSelection:
+            doc.SetActiveObject(obj, c4d.SELECTION_ADD);
+
+    pass
+
+def ExportFBX(doc, exportPath, selectionSetName, objects):
+    plug = c4d.plugins.FindPlugin(1026370, c4d.PLUGINTYPE_SCENESAVER)
+    if plug is None:
+        print("Could not find FBX Export plugin");
+        return
+
+    op = {}
+
+    # Send MSG_RETRIEVEPRIVATEDATA to FBX export plugin
+    if plug.Message(c4d.MSG_RETRIEVEPRIVATEDATA, op):
+        if "imexporter" not in op:
+            print("Could not Send MSG_RETRIEVEPRIVATEDATA to FBX export plugin");
+            return
+
+        # BaseList2D object stored in "imexporter" key hold the settings
+        fbxExport = op["imexporter"]
+        if fbxExport is None:
+            print("Could not find fbxExport")
+            return
+
+        # Backup current selection
+        backupObjectSelection = doc.GetActiveObjects(c4d.GETACTIVEOBJECTFLAGS_SELECTIONORDER|c4d.GETACTIVEOBJECTFLAGS_CHILDREN);
+
+        # Deselect them
+        for obj in backupObjectSelection:
+            doc.SetActiveObject(obj, c4d.SELECTION_SUB);
+
+        # Select the objects (needed for animation export)
+        for obj in objects:
+            print(obj);
+            doc.SetActiveObject(obj, c4d.SELECTION_ADD);
+
+        # Finally export the document
+        if c4d.documents.SaveDocument(doc, exportPath, c4d.SAVEDOCUMENTFLAGS_DONTADDTORECENTLIST, c4d.FORMAT_FBX_EXPORT) == False:
+            print("Could not export selection set " + selectionSetName);
+        else:
+            print("Exported selection set " + selectionSetName);
 
         # Deselect export objects
         for obj in objects:
